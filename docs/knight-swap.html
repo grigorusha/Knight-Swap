@@ -274,6 +274,26 @@
   }
   .cell.empty.target:hover { background: #5f6f95; }
 
+  .cell.knight.hint-from {
+    background: #6d6440;
+    box-shadow: 0 0 0 3px #ffd54a, 0 0 16px rgba(255, 213, 74, .7);
+    cursor: default;
+  }
+  .cell.empty.hint-to {
+    background: #3a6a4a;
+    box-shadow: inset 0 0 0 2px #4ad97a;
+    cursor: pointer;
+  }
+  .cell.empty.hint-to::after {
+    content: "";
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background: #4ad97a;
+    box-shadow: 0 0 10px #4ad97a;
+  }
+  .cell.empty.hint-to:hover { background: #468660; }
+
   .cell.knight {
     background: #556590;
     box-shadow: inset 0 0 0 2px #6b7ba5;
@@ -453,10 +473,18 @@
   button.secondary { background: #65718e; }
   button.secondary:hover:not(:disabled) { background: #7b88a9; }
 
-  button.solve { background: #1d9e6e; }
-  button.solve:hover:not(:disabled) { background: #27bb84; }
+  button.hint-btn { background: #6b8aa8; }
+  button.hint-btn:hover:not(:disabled) { background: #7fa0bf; }
+  button.hint-btn:active:not(:disabled) { transform: scale(.97); }
+  button.hint-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  button.solve { background: #6fae8c; }
+  button.solve:hover:not(:disabled) { background: #87c2a2; }
   button.solve.stop { background: #c94a3a; }
   button.solve.stop:hover:not(:disabled) { background: #e05a4a; }
+
+  button.danger { background: #a84c4c; }
+  button.danger:hover:not(:disabled) { background: #c25a5a; }
 
   .editor-panel {
     display: flex;
@@ -628,6 +656,7 @@
     cursor: pointer;
     transition: transform .15s, background .15s, box-shadow .15s;
     user-select: none;
+    position: relative;
   }
   .gallery-tile:hover {
     background: #4f5b78;
@@ -652,6 +681,28 @@
     white-space: nowrap;
     font-weight: 500;
     line-height: 1.3;
+  }
+
+  .gallery-solved-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 14px;
+    color: #4ad97a;
+    text-shadow: 0 0 6px rgba(74, 217, 122, .6);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .gallery-user-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffd54a;
+    text-shadow: 0 0 6px rgba(255, 213, 74, .6);
+    pointer-events: none;
+    z-index: 2;
   }
 
   .gallery-preview-wrap {
@@ -724,6 +775,7 @@
     gap: 10px;
     justify-content: center;
     margin-top: 6px;
+    flex-wrap: wrap;
   }
   .toggle-btn {
     padding: 8px 16px;
@@ -821,6 +873,20 @@
   }
   body.light .cell.empty.target:hover { background: #cce8d8; }
 
+  body.light .cell.knight.hint-from {
+    background: #f4e8b8;
+    box-shadow: 0 0 0 3px #d99a10, 0 0 16px rgba(217, 154, 16, .5);
+  }
+  body.light .cell.empty.hint-to {
+    background: #d4f0dc;
+    box-shadow: inset 0 0 0 2px #1e9e52;
+  }
+  body.light .cell.empty.hint-to::after {
+    background: #1e9e52;
+    box-shadow: 0 0 10px rgba(30, 158, 82, .7);
+  }
+  body.light .cell.empty.hint-to:hover { background: #bfe6c9; }
+
   body.light .cell.knight {
     background: #e8ecf5;
     box-shadow: inset 0 0 0 2px #c8d0e0;
@@ -864,13 +930,14 @@
   body.light button.secondary:hover:not(:disabled) {
     background: #c0c8d8;
   }
-  body.light button.solve {
-    background: #1d9e6e;
-    color: #fff;
-  }
-  body.light button.solve:hover:not(:disabled) { background: #27bb84; }
-  body.light button.solve.stop { background: #c94a3a; }
+  body.light button.hint-btn { background: #b8cfe0; color: #1a2030; }
+  body.light button.hint-btn:hover:not(:disabled) { background: #c8dced; }
+  body.light button.solve { background: #b2e0c2; color: #1a2030; }
+  body.light button.solve:hover:not(:disabled) { background: #c6ecd2; }
+  body.light button.solve.stop { background: #c94a3a; color: #fff; }
   body.light button.solve.stop:hover:not(:disabled) { background: #e05a4a; }
+  body.light button.danger { background: #d07070; color: #fff; }
+  body.light button.danger:hover:not(:disabled) { background: #dd8080; }
 
   body.light .editor-panel {
     background: #ffffff;
@@ -929,6 +996,8 @@
     color: #d04040;
     -webkit-text-stroke: 0.8px #601010;
   }
+  body.light .gallery-solved-badge { color: #1e9e52; text-shadow: 0 0 6px rgba(30, 158, 82, .5); }
+  body.light .gallery-user-badge { color: #d99a10; text-shadow: 0 0 6px rgba(217, 154, 16, .5); }
 
   body.light .info-lines { color: #4a5568; }
   body.light .info-lines a { color: #2f6df6; border-bottom-color: rgba(47, 109, 246, .4); }
@@ -977,7 +1046,8 @@
         <button id="reset" class="secondary">↺ Заново</button>
       </div>
       <div class="controls-row">
-        <button id="solve" class="solve">💡 Решить</button>
+        <button id="hint" class="hint-btn">💡 Подсказка</button>
+        <button id="solve" class="solve">🎯 Решить</button>
         <button id="edit" class="secondary">✎ Редактировать</button>
       </div>
     </div>
@@ -1022,6 +1092,7 @@
       <div class="editor-row">
         <button id="editor-run" class="solve">▶ Запустить</button>
         <button id="editor-cancel" class="secondary">✕ Отмена</button>
+        <button id="editor-delete" class="danger" style="display:none">🗑 Удалить</button>
       </div>
     </div>
   </div>
@@ -1049,10 +1120,9 @@
   "use strict";
 
   /* ============================================================
-     Головоломки
+     Встроенные головоломки
      ============================================================ */
-  const PUZZLES = [
-    /* gelo */
+  const BUILTIN_PUZZLES = [
     { name: 'Шесть на шесть', nameEn: 'Six by six', author: 'Gelo', rotated: false,
       data: [['x','w','_','b','x'],['w','w','x','b','b'],['w','w','x','b','b'],['x','w','_','b','x']] },
     { name: 'Эх вы, кони - 1', nameEn: 'Hey you, horses - 1', author: 'Gelo', rotated: false,
@@ -1092,7 +1162,6 @@
     { name: 'S-мини', nameEn: 'S-mini', author: 'Gelo', rotated: false,
       data: [['b','b','b'],['_','x','x'],['r','r','r'],['x','x','_'],['w','w','w']] },
 
-    /* grigr */
     { name: 'Вертикаль - 1', nameEn: 'Vertical - 1', author: 'Grigr', rotated: false,
       data: [['w','_','b'],['w','_','b'],['w','_','b'],['w','_','b']] },
     { name: 'Вертикаль - 2', nameEn: 'Vertical - 2', author: 'Grigr', rotated: false,
@@ -1108,7 +1177,6 @@
     { name: 'Хоровод', author: 'Grigr', rotated: false,
       data: [['x','w','x','x','x','x','x'],['x','r','r','r','r','r','b'],['x','r','r','r','r','r','x'],['x','r','r','_','r','r','x'],['x','r','r','r','r','r','x'],['b','r','r','r','r','r','x'],['x','x','x','x','x','w','x']] },
 
-    /* public */
     { name: '3x3', author: 'Public', rotated: false,
       data: [['w','_','w'],['_','_','_'],['b','_','b']] },
     { name: '3x4', author: 'Public', rotated: false,
@@ -1116,6 +1184,9 @@
     { name: '4x4', author: 'Public', rotated: false,
       data: [['x','w','x','x'],['x','_','_','x'],['x','_','w','_'],['b','_','b','_']] }
   ];
+
+  let PUZZLES = BUILTIN_PUZZLES.slice();
+  const userFlag = new Array(PUZZLES.length).fill(false);
 
   /* ============================================================
      Словарь
@@ -1130,12 +1201,13 @@
       hintEdit:
         'Редактор: выберите кисть и кликайте по клеткам (можно вести мышью).<br>' +
         'Задайте имя и размер, поверните поле и нажмите «Запустить».',
-      authorLabel: 'Уровень:',
+      authorLabel: 'Название:',
       authorOf: 'Автор:',
       moves: 'Ходов:',
       winMessage: function (n, p) { return '🎉 Победа! Все кони поменялись местами за ' + n + ' ' + p + '.'; },
       searching: 'Ищу решение…',
       searchingDepth: function (d, p, t) { return 'Ищу решение… глубина: ' + d + ' ' + p + '. время ' + t + ' сек…'; },
+      hintSearching: function (t) { return 'Ищу подсказку… время ' + t + ' сек…'; },
       playingPath: function (i, m) { return 'Решение: ' + i + ' / ' + m + '…'; },
       searchCancelled: 'Поиск отменён',
       tooHard: function (n) { return 'Уровень слишком сложный: превышен лимит состояний (' + n + ').'; },
@@ -1143,8 +1215,13 @@
       searchAborted: 'Поиск прерван.',
       solutionFound: function (n, p) { return 'Решение: ' + n + ' ' + p + '. Проигрываю…'; },
       internalError: 'Внутренняя ошибка поиска. Попробуйте ещё раз.',
+      hintReady: function (from, to) { return 'Подсказка: ' + from + ' → ' + to + '. Кликните по подсвеченной клетке.'; },
+      hintUnavailable: 'Подсказка недоступна: решение не найдено.',
+      hintClickToMove: 'Совершите подсказанный ход кликом по зелёной клетке.',
       btnUndo: '↩ Ундо', btnRedo: '↪ Редо', btnReset: '↺ Заново',
-      btnSolve: '💡 Решить', btnStop: '⏹ Стоп', btnEdit: '✎ Редактировать',
+      btnSolve: '🎯 Решить', btnStop: '⏹ Стоп', btnEdit: '✎ Редактировать',
+      btnHint: '💡 Подсказка',
+      btnDelete: '🗑 Удалить',
       lblName: 'Название:', lblAuthor: 'Автор:',
       lblSize: 'Размер:', lblSizeHint: 'строки × столбцы (1–10)',
       lblFill: 'Заполнить:', lblBrush: 'Кисть:',
@@ -1173,17 +1250,20 @@
       movesPlaceholder: 'A1-B3, C2-A1, …',
       copyMovesTitle: 'Скопировать ходы', pasteMovesTitle: 'Вставить и применить ходы',
       galleryOpen: 'Галерея', galleryTitle: 'Галерея головоломок', galleryBack: '← Назад',
-      copyAllOk: '✓ Скопированы все головоломки', copyAllFail: '⚠ Не удалось скопировать'
+      copyAllOk: '✓ Скопированы все головоломки', copyAllFail: '⚠ Не удалось скопировать',
+      authorUser: 'Мои уровни',
+      deleteConfirm: 'Удалить этот уровень?'
     },
     en: {
       title: 'Knight Swap',
       pickerLabel: 'Puzzle:',
       hintPlay: 'Goal — swap white and black knights,<br>red ponies must return to their starting squares.',
       hintEdit: 'Editor: pick a brush and click cells (drag to paint).<br>Set the name and size, rotate if needed, then press "Start".',
-      authorLabel: 'Level:', authorOf: 'Author:', moves: 'Moves:',
+      authorLabel: 'Name:', authorOf: 'Author:', moves: 'Moves:',
       winMessage: function (n, p) { return '🎉 Victory! All knights swapped in ' + n + ' ' + p + '.'; },
       searching: 'Searching for a solution…',
       searchingDepth: function (d, p, t) { return 'Searching… depth: ' + d + ' ' + p + '. time ' + t + ' s…'; },
+      hintSearching: function (t) { return 'Looking for a hint… time ' + t + ' s…'; },
       playingPath: function (i, m) { return 'Solution: ' + i + ' / ' + m + '…'; },
       searchCancelled: 'Search cancelled',
       tooHard: function (n) { return 'Level is too complex: state limit exceeded (' + n + ').'; },
@@ -1191,8 +1271,13 @@
       searchAborted: 'Search aborted.',
       solutionFound: function (n, p) { return 'Solution: ' + n + ' ' + p + '. Playing back…'; },
       internalError: 'Internal search error. Please try again.',
+      hintReady: function (from, to) { return 'Hint: ' + from + ' → ' + to + '. Click the highlighted cell.'; },
+      hintUnavailable: 'Hint unavailable: no solution found.',
+      hintClickToMove: 'Make the suggested move by clicking the green cell.',
       btnUndo: '↩ Undo', btnRedo: '↪ Redo', btnReset: '↺ Reset',
-      btnSolve: '💡 Solve', btnStop: '⏹ Stop', btnEdit: '✎ Edit',
+      btnSolve: '🎯 Solve', btnStop: '⏹ Stop', btnEdit: '✎ Edit',
+      btnHint: '💡 Hint',
+      btnDelete: '🗑 Delete',
       lblName: 'Name:', lblAuthor: 'Author:',
       lblSize: 'Size:', lblSizeHint: 'rows × cols (1–10)',
       lblFill: 'Fill:', lblBrush: 'Brush:',
@@ -1220,7 +1305,9 @@
       movesPlaceholder: 'A1-B3, C2-A1, …',
       copyMovesTitle: 'Copy moves', pasteMovesTitle: 'Paste and apply moves',
       galleryOpen: 'Gallery', galleryTitle: 'Puzzle gallery', galleryBack: '← Back',
-      copyAllOk: '✓ All puzzles copied', copyAllFail: '⚠ Failed to copy'
+      copyAllOk: '✓ All puzzles copied', copyAllFail: '⚠ Failed to copy',
+      authorUser: 'My levels',
+      deleteConfirm: 'Delete this level?'
     }
   };
 
@@ -1254,6 +1341,11 @@
   const LETTERS = 'ABCDEFGHIJ';
   const LABEL_SIZE = 14;
 
+  const STORAGE_KEY = 'knightSwap_state_v2';
+  const USER_PUZZLES_KEY = 'knightSwap_user_levels_v1';
+
+  const PROGRESS_INTERVAL_MS = 200;
+
   /* ============================================================
      DOM
      ============================================================ */
@@ -1286,6 +1378,7 @@
   const undoBtn      = document.getElementById('undo');
   const redoBtn      = document.getElementById('redo');
   const resetBtn     = document.getElementById('reset');
+  const hintBtn      = document.getElementById('hint');
   const solveBtn     = document.getElementById('solve');
   const editBtn      = document.getElementById('edit');
   const nameInput    = document.getElementById('editor-name');
@@ -1298,6 +1391,7 @@
   const copyAllBtn   = document.getElementById('editor-copy-all');
   const runBtn       = document.getElementById('editor-run');
   const cancelBtn    = document.getElementById('editor-cancel');
+  const deleteBtn    = document.getElementById('editor-delete');
   const fillXBtn     = document.getElementById('fillX');
   const fillEmptyBtn = document.getElementById('fillEmpty');
   const lblName      = document.getElementById('lblName');
@@ -1317,6 +1411,7 @@
   const themeBtn     = document.getElementById('themeBtn');
 
   const DEFAULT_AUTHOR = 'Gelo';
+  const USER_AUTHOR    = 'User';
 
   /* ============================================================
      Состояние игры
@@ -1334,6 +1429,11 @@
   let playbackTimer = null;
   let searchGeneration = 0;
 
+  let hintFrom = null;
+  let hintTo   = null;
+
+  let solvedSet = new Set();
+
   let statusState = { key: 'moves', args: [] };
 
   let editorMode = false;
@@ -1345,6 +1445,11 @@
   };
   let editorCells = [];
   let painting = false;
+
+  let searchProgressTimer = null;
+  let searchProgressStart = 0;
+  let searchProgressKind  = 'search';
+  let lastDepthTotal = 0;
 
   /* ============================================================
      Вспомогательные
@@ -1405,6 +1510,97 @@
     return (dr === 1 && dc === 2) || (dr === 2 && dc === 1);
   }
 
+  function clearHint() {
+    hintFrom = null;
+    hintTo   = null;
+  }
+
+  function isUserLevel(idx) {
+    return idx >= 0 && idx < userFlag.length && userFlag[idx] === true;
+  }
+
+  /* ============================================================
+     Пользовательские уровни
+     ============================================================ */
+  function loadUserPuzzles() {
+    try {
+      const raw = localStorage.getItem(USER_PUZZLES_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return [];
+      const out = [];
+      for (let i = 0; i < arr.length; i++) {
+        const p = arr[i];
+        if (!p || typeof p !== 'object') continue;
+        if (!Array.isArray(p.data) || p.data.length === 0) continue;
+        if (!Array.isArray(p.data[0]) || p.data[0].length === 0) continue;
+        if (p.data.length > 10 || p.data[0].length > 10) continue;
+        const name = typeof p.name === 'string' ? p.name : 'Новый уровень';
+        const author = typeof p.author === 'string' ? p.author : USER_AUTHOR;
+        out.push({
+          name: name, nameEn: name, author: author,
+          data: p.data.map(function (row) { return row.slice(); }),
+          rotated: !!p.rotated
+        });
+      }
+      return out;
+    } catch (e) { return []; }
+  }
+
+  function saveUserPuzzles() {
+    try {
+      const list = [];
+      for (let i = 0; i < PUZZLES.length; i++) {
+        if (userFlag[i]) {
+          const p = PUZZLES[i];
+          list.push({
+            name: p.name,
+            author: p.author || USER_AUTHOR,
+            data: p.data.map(function (row) { return row.slice(); }),
+            rotated: !!p.rotated
+          });
+        }
+      }
+      localStorage.setItem(USER_PUZZLES_KEY, JSON.stringify(list));
+    } catch (e) {}
+  }
+
+  function rebuildPuzzlesFromStorage() {
+    const userList = loadUserPuzzles();
+    PUZZLES = BUILTIN_PUZZLES.slice();
+    userFlag.length = 0;
+    for (let i = 0; i < BUILTIN_PUZZLES.length; i++) userFlag.push(false);
+    for (let i = 0; i < userList.length; i++) {
+      PUZZLES.push(userList[i]);
+      userFlag.push(true);
+    }
+  }
+
+  /* ============================================================
+     Игровое состояние (тема, язык, последний уровень)
+     ============================================================ */
+  function saveGameState() {
+    try {
+      const state = {
+        lang: lang,
+        theme: theme,
+        solved: Array.from(solvedSet),
+        currentPuzzleIdx: currentPuzzleIdx
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function loadGameState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const st = JSON.parse(raw);
+      if (!st || typeof st !== 'object') return null;
+      return st;
+    } catch (e) { return null; }
+  }
+
   /* ============================================================
      Статус
      ============================================================ */
@@ -1425,6 +1621,9 @@
         text = s.searchingDepth(statusState.args[0],
           fmtSteps(statusState.args[0]), statusState.args[1]);
         break;
+      case 'hintSearching':
+        text = s.hintSearching(statusState.args[0]);
+        break;
       case 'playingPath':
         text = s.playingPath(statusState.args[0], statusState.args[1]);
         break;
@@ -1441,10 +1640,37 @@
       case 'warnUnbalanced':
         text = s.warnUnbalanced(statusState.args[0], statusState.args[1]);
         break;
+      case 'hintReady':
+        text = s.hintReady(statusState.args[0], statusState.args[1]);
+        break;
+      case 'hintUnavailable': text = s.hintUnavailable; break;
+      case 'hintClickToMove': text = s.hintClickToMove; break;
       default: text = '';
     }
     statusEl.textContent = text;
     statusEl.classList.toggle('win', statusState.key === 'win');
+  }
+
+  function startSearchProgress(kind) {
+    stopSearchProgress();
+    searchProgressKind  = kind;
+    searchProgressStart = performance.now();
+    lastDepthTotal = 0;
+    searchProgressTimer = setInterval(function () {
+      const elapsed = ((performance.now() - searchProgressStart) / 1000).toFixed(1);
+      if (searchProgressKind === 'hint') {
+        setStatus('hintSearching', elapsed);
+      } else {
+        setStatus('searchingDepth', lastDepthTotal, elapsed);
+      }
+    }, PROGRESS_INTERVAL_MS);
+  }
+
+  function stopSearchProgress() {
+    if (searchProgressTimer) {
+      clearInterval(searchProgressTimer);
+      searchProgressTimer = null;
+    }
   }
 
   /* ============================================================
@@ -1467,9 +1693,11 @@
     copyAllBtn.textContent = t('btnCopyAll');
     runBtn.textContent    = t('btnRun');
     cancelBtn.textContent = t('btnCancel');
+    deleteBtn.textContent = t('btnDelete');
     undoBtn.textContent   = t('btnUndo');
     redoBtn.textContent   = t('btnRedo');
     resetBtn.textContent  = t('btnReset');
+    hintBtn.textContent   = t('btnHint');
     editBtn.textContent   = t('btnEdit');
     infoLine1.textContent = t('infoLine1');
     infoLine2.textContent = t('infoLine2');
@@ -1507,29 +1735,6 @@
     themeBtn.textContent = (theme === 'dark') ? t('btnThemeDark') : t('btnThemeLight');
   }
 
-  function savePrefs() {
-    try {
-      localStorage.setItem('knightSwap_lang', lang);
-      localStorage.setItem('knightSwap_theme', theme);
-    } catch (e) {}
-  }
-  function loadPrefs() {
-    try {
-      const savedLang = localStorage.getItem('knightSwap_lang');
-      if (savedLang === 'ru' || savedLang === 'en') {
-        lang = savedLang;
-      } else {
-        const browserLang = (navigator.language ||
-                             navigator.userLanguage ||
-                             navigator.languages && navigator.languages[0] ||
-                             '').toLowerCase();
-        lang = browserLang.indexOf('ru') === 0 ? 'ru' : 'en';
-      }
-      const th = localStorage.getItem('knightSwap_theme');
-      if (th === 'dark' || th === 'light') theme = th;
-    } catch (e) {}
-  }
-
   /* ============================================================
      Строка ходов
      ============================================================ */
@@ -1550,6 +1755,7 @@
   function openGallery() {
     if (editorMode) return;
     stopAllActivity();
+    clearHint();
     galleryMode = true;
     gameArea.style.display = 'none';
     galleryWrap.style.display = 'block';
@@ -1570,7 +1776,8 @@
     const byAuthor = {};
     const order = [];
     for (let i = 0; i < PUZZLES.length; i++) {
-      const a = PUZZLES[i].author || DEFAULT_AUTHOR;
+      let a = PUZZLES[i].author || DEFAULT_AUTHOR;
+      if (isUserLevel(i)) a = t('authorUser');
       if (!byAuthor[a]) { byAuthor[a] = []; order.push(a); }
       byAuthor[a].push(i);
     }
@@ -1590,6 +1797,22 @@
         const tile = document.createElement('div');
         tile.className = 'gallery-tile';
         if (idx === currentPuzzleIdx) tile.classList.add('active-puzzle');
+
+        if (solvedSet.has(idx)) {
+          const badge = document.createElement('div');
+          badge.className = 'gallery-solved-badge';
+          badge.textContent = '✓';
+          badge.title = 'Решено';
+          tile.appendChild(badge);
+        }
+
+        if (isUserLevel(idx)) {
+          const ubadge = document.createElement('div');
+          ubadge.className = 'gallery-user-badge';
+          ubadge.textContent = '+';
+          ubadge.title = t('authorUser');
+          tile.appendChild(ubadge);
+        }
 
         const wrap = document.createElement('div');
         wrap.className = 'gallery-preview-wrap';
@@ -1720,16 +1943,21 @@
     if ((c.w > 0 || c.b > 0) && c.w !== c.b) {
       setStatus('warnUnbalanced', c.w, c.b);
     }
+
+    saveGameState();
   }
 
   function updateAuthorLine() {
     const name = (lang === 'en') ? (currentNameEn || currentName) : currentName;
-    if (currentAuthor) {
+    const authorShown = isUserLevel(currentPuzzleIdx)
+      ? t('authorUser')
+      : currentAuthor;
+    if (authorShown) {
       authorLine.innerHTML =
         escapeHTML(t('authorLabel')) + ' ' +
         '<span class="author-name">' + escapeHTML(name) + '</span>' +
         ' &nbsp;·&nbsp; ' + escapeHTML(t('authorOf')) + ' ' +
-        '<span class="author-name">' + escapeHTML(currentAuthor) + '</span>';
+        '<span class="author-name">' + escapeHTML(authorShown) + '</span>';
     } else {
       authorLine.innerHTML =
         escapeHTML(t('authorLabel')) + ' ' +
@@ -1747,7 +1975,8 @@
     const byAuthor = {};
     const order = [];
     for (let i = 0; i < PUZZLES.length; i++) {
-      const a = PUZZLES[i].author || DEFAULT_AUTHOR;
+      let a = PUZZLES[i].author || DEFAULT_AUTHOR;
+      if (isUserLevel(i)) a = t('authorUser');
       if (!byAuthor[a]) { byAuthor[a] = []; order.push(a); }
       byAuthor[a].push(i);
     }
@@ -1761,7 +1990,10 @@
         const idx = indices[k];
         const opt = document.createElement('option');
         opt.value = String(idx);
-        opt.textContent = getLocalName(PUZZLES[idx]);
+        let suffix = '';
+        if (isUserLevel(idx)) suffix += ' +';
+        if (solvedSet.has(idx)) suffix += ' ✓';
+        opt.textContent = getLocalName(PUZZLES[idx]) + suffix;
         group.appendChild(opt);
       }
       puzzleSel.appendChild(group);
@@ -1786,12 +2018,14 @@
   }
 
   function loadPuzzle(idx) {
+    if (idx < 0 || idx >= PUZZLES.length) idx = 0;
     currentPuzzleIdx = idx;
     loadPuzzleData(PUZZLES[idx], idx);
   }
 
   function stopAllActivity() {
     searchGeneration++;
+    stopSearchProgress();
     if (playbackTimer) { clearTimeout(playbackTimer); playbackTimer = null; }
     if (mode === 'searching' || mode === 'playing' || animating) {
       mode = 'idle';
@@ -1806,6 +2040,7 @@
     if (idx < 0 || idx >= PUZZLES.length) return;
     if (editorMode) return;
     stopAllActivity();
+    clearHint();
     puzzleSel.value = String(idx);
     loadPuzzle(idx);
   }
@@ -1826,6 +2061,7 @@
     targets  = [];
     moves    = 0;
     solved   = false;
+    clearHint();
 
     timeline = [{ board: START.map(row => row.slice()), moves: 0, solved: false, move: null }];
     cursor = 0;
@@ -1834,6 +2070,7 @@
     animating = false;
     searchGeneration++;
     playbackId++;
+    stopSearchProgress();
     if (playbackTimer) { clearTimeout(playbackTimer); playbackTimer = null; }
     flyer.classList.remove('animating');
     flyer.style.opacity = '0';
@@ -1945,9 +2182,16 @@
         }
 
         const v = board[r][c];
+
+        const isHintFrom = hintFrom &&
+          hintFrom[0] === r && hintFrom[1] === c;
+        const isHintTo = hintTo &&
+          hintTo[0] === r && hintTo[1] === c;
+
         if (v === '_') {
           cell.classList.add('empty');
           if (targetKeys.has(r + ',' + c)) cell.classList.add('target');
+          if (isHintTo) cell.classList.add('hint-to');
         } else {
           const cls = v === 'w' ? 'white' : v === 'b' ? 'black' : 'red';
           cell.classList.add('knight', cls);
@@ -1955,8 +2199,11 @@
           span.className = 'glyph';
           span.textContent = '♞';
           cell.appendChild(span);
+
           if (selected && selected[0] === r && selected[1] === c) {
             cell.classList.add('selected');
+          } else if (isHintFrom) {
+            cell.classList.add('hint-from');
           } else if (getTargets(r, c).length === 0) {
             cell.classList.add('nomove');
           }
@@ -2094,9 +2341,15 @@
     cursor++;
     updateMovesText();
 
+    clearHint();
+
     if (!animate) {
       board = nb; moves = newMoves; solved = newSolved;
-      if (solved) setStatus('win'); else setStatus('moves');
+      if (solved) {
+        onSolved();
+      } else {
+        setStatus('moves');
+      }
       render();
       return;
     }
@@ -2108,9 +2361,20 @@
 
     animateMove(fr, fc, tr, tc, color, function () {
       board = nb; moves = newMoves; solved = newSolved;
-      if (solved) setStatus('win'); else setStatus('moves');
+      if (solved) {
+        onSolved();
+      } else {
+        setStatus('moves');
+      }
       render();
     });
+  }
+
+  function onSolved() {
+    setStatus('win');
+    solvedSet.add(currentPuzzleIdx);
+    renderPuzzleSelect();
+    saveGameState();
   }
 
   function onCellClick(r, c) {
@@ -2147,10 +2411,13 @@
      ============================================================ */
   function updateButtons() {
     const idle = (mode === 'idle' && !animating);
+
     undoBtn.disabled  = !idle || cursor === 0;
     redoBtn.disabled  = !idle || cursor >= timeline.length - 1;
     resetBtn.disabled = !idle;
     editBtn.disabled  = !idle;
+    hintBtn.disabled  = !idle || solved;
+
     updateSolveButton();
   }
 
@@ -2190,6 +2457,7 @@
     board = animBoard;
     selected = null;
     targets  = [];
+    clearHint();
     render();
 
     animateMove(m.to[0], m.to[1], m.from[0], m.from[1], m.color, function () {
@@ -2215,6 +2483,7 @@
     board = animBoard;
     selected = null;
     targets  = [];
+    clearHint();
     render();
 
     animateMove(m.from[0], m.from[1], m.to[0], m.to[1], m.color, function () {
@@ -2222,7 +2491,14 @@
       board = timeline[cursor].board;
       moves = timeline[cursor].moves;
       solved = timeline[cursor].solved;
-      if (solved) setStatus('win'); else setStatus('moves');
+      if (solved) {
+        setStatus('win');
+        solvedSet.add(currentPuzzleIdx);
+        renderPuzzleSelect();
+        saveGameState();
+      } else {
+        setStatus('moves');
+      }
       render();
       updateMovesText();
     });
@@ -2531,19 +2807,73 @@
   }
 
   /* ============================================================
+     Подсказка
+     ============================================================ */
+  async function requestHint() {
+    if (animating || solved) return;
+    if (mode !== 'idle') return;
+
+    const myGen = ++searchGeneration;
+    mode = 'searching';
+    updateButtons();
+    startSearchProgress('hint');
+
+    await new Promise(r => setTimeout(r, 20));
+
+    let path = null, fail = false;
+    try {
+      path = await findSolution(myGen, null);
+    } catch (e) {
+      fail = true;
+    }
+
+    stopSearchProgress();
+
+    if (searchGeneration !== myGen) return;
+
+    mode = 'idle';
+    updateButtons();
+
+    if (fail || !path || path.length === 0) {
+      clearHint();
+      render();
+      setStatus('hintUnavailable');
+      return;
+    }
+
+    const first = path[0];
+    const fr = cells[first[0]][0], fc = cells[first[0]][1];
+    const tr = cells[first[1]][0], tc = cells[first[1]][1];
+
+    hintFrom = [fr, fc];
+    hintTo   = [tr, tc];
+    selected = null;
+    targets  = [];
+
+    render();
+    setStatus('hintReady', cellToNotation(fr, fc), cellToNotation(tr, tc));
+  }
+
+  /* ============================================================
      РЕДАКТОР
      ============================================================ */
   function enterEditor() {
     if (animating || mode !== 'idle') return;
     editorSourceIdx = currentPuzzleIdx;
+
+    const isUser = isUserLevel(editorSourceIdx);
+
     editor.rows    = ROWS;
     editor.cols    = COLS;
     editor.data    = START.map(row => row.slice());
     editor.rotated = rotated;
     editor.tool    = 'w';
-    editor.name    = currentName + ' (copy)';
+    editor.name    = isUser ? currentName : (currentName + ' (copy)');
     editor.author  = currentAuthor || DEFAULT_AUTHOR;
     editorMode = true;
+    painting = false;
+
+    clearHint();
 
     pickerRow.style.display    = 'none';
     sizePanel.style.display    = 'flex';
@@ -2559,6 +2889,8 @@
     authorInput.value = editor.author;
     rowsInput.value = editor.rows;
     colsInput.value = editor.cols;
+
+    deleteBtn.style.display = isUser ? '' : 'none';
 
     updateNavButtons();
     updateRotateButton();
@@ -2576,6 +2908,7 @@
     mainControls.style.display = '';
     movesRow.style.display     = '';
     editorPanel.style.display  = 'none';
+    deleteBtn.style.display    = 'none';
     hintEl.innerHTML = t('hintPlay');
     updateNavButtons();
     loadPuzzleData({
@@ -2591,6 +2924,7 @@
     }
   }
 
+  /* Рисование в редакторе: клетки без обработчиков — вся логика через делегирование. */
   function renderEditor() {
     boardEl.innerHTML = '';
     boardEl.classList.toggle('rotated', editor.rotated);
@@ -2601,21 +2935,10 @@
       editorCells[r] = [];
       for (let c = 0; c < editor.cols; c++) {
         const cell = document.createElement('div');
+        cell.className = 'cell editor-cell';
+        cell.dataset.r = String(r);
+        cell.dataset.c = String(c);
         applyEditorCellVisual(cell, editor.data[r][c]);
-        (function (rr, cc, cellEl) {
-          cellEl.addEventListener('mousedown', function (e) {
-            e.preventDefault();
-            painting = true;
-            editor.data[rr][cc] = editor.tool;
-            applyEditorCellVisual(cellEl, editor.tool);
-          });
-          cellEl.addEventListener('mouseenter', function () {
-            if (painting) {
-              editor.data[rr][cc] = editor.tool;
-              applyEditorCellVisual(cellEl, editor.tool);
-            }
-          });
-        })(r, c, cell);
         editorCells[r][c] = cell;
         boardEl.appendChild(cell);
       }
@@ -2624,6 +2947,9 @@
 
   function applyEditorCellVisual(cellEl, v) {
     cellEl.className = 'cell editor-cell';
+    if (!cellEl.dataset.r) {
+      /* уже установлено */
+    }
     cellEl.innerHTML = '';
     if (v === 'x') {
       cellEl.classList.add('off');
@@ -2670,31 +2996,84 @@
     mainControls.style.display = '';
     movesRow.style.display     = '';
     editorPanel.style.display  = 'none';
+    deleteBtn.style.display    = 'none';
     hintEl.innerHTML = t('hintPlay');
     updateNavButtons();
 
-    const isSameAsSource =
-      (newName === PUZZLES[editorSourceIdx].name) &&
-      (newAuthor === (PUZZLES[editorSourceIdx].author || DEFAULT_AUTHOR));
+    const isUserSource = isUserLevel(editorSourceIdx);
 
-    if (isSameAsSource) {
+    if (isUserSource) {
       PUZZLES[editorSourceIdx] = {
         name: newName, nameEn: newName, author: newAuthor,
         data: editor.data.map(row => row.slice()), rotated: editor.rotated
       };
+      userFlag[editorSourceIdx] = true;
+      saveUserPuzzles();
       renderPuzzleSelect();
       puzzleSel.value = String(editorSourceIdx);
       loadPuzzle(editorSourceIdx);
     } else {
-      PUZZLES.push({
-        name: newName, nameEn: newName, author: newAuthor,
-        data: editor.data.map(row => row.slice()), rotated: editor.rotated
-      });
-      const newIdx = PUZZLES.length - 1;
-      renderPuzzleSelect();
-      puzzleSel.value = String(newIdx);
-      changePuzzle(newIdx);
+      const isSameAsSource =
+        (newName === PUZZLES[editorSourceIdx].name) &&
+        (newAuthor === (PUZZLES[editorSourceIdx].author || DEFAULT_AUTHOR));
+
+      if (isSameAsSource) {
+        PUZZLES[editorSourceIdx] = {
+          name: newName, nameEn: newName, author: newAuthor,
+          data: editor.data.map(row => row.slice()), rotated: editor.rotated
+        };
+        renderPuzzleSelect();
+        puzzleSel.value = String(editorSourceIdx);
+        loadPuzzle(editorSourceIdx);
+      } else {
+        PUZZLES.push({
+          name: newName, nameEn: newName, author: newAuthor,
+          data: editor.data.map(row => row.slice()), rotated: editor.rotated
+        });
+        userFlag.push(true);
+        const newIdx = PUZZLES.length - 1;
+        saveUserPuzzles();
+        renderPuzzleSelect();
+        puzzleSel.value = String(newIdx);
+        changePuzzle(newIdx);
+      }
     }
+  }
+
+  function deleteEditedPuzzle() {
+    if (!isUserLevel(editorSourceIdx)) return;
+    if (!confirm(t('deleteConfirm'))) return;
+
+    PUZZLES.splice(editorSourceIdx, 1);
+    userFlag.splice(editorSourceIdx, 1);
+    saveUserPuzzles();
+
+    const newSolved = new Set();
+    solvedSet.forEach(function (i) {
+      if (i === editorSourceIdx) return;
+      if (i > editorSourceIdx) newSolved.add(i - 1);
+      else newSolved.add(i);
+    });
+    solvedSet = newSolved;
+    saveGameState();
+
+    editorMode = false;
+    painting = false;
+    pickerRow.style.display    = '';
+    sizePanel.style.display    = 'none';
+    mainControls.style.display = '';
+    movesRow.style.display     = '';
+    editorPanel.style.display  = 'none';
+    deleteBtn.style.display    = 'none';
+    hintEl.innerHTML = t('hintPlay');
+    updateNavButtons();
+
+    let nextIdx = editorSourceIdx - 1;
+    if (nextIdx < 0) nextIdx = 0;
+    if (nextIdx >= PUZZLES.length) nextIdx = PUZZLES.length - 1;
+    renderPuzzleSelect();
+    puzzleSel.value = String(nextIdx);
+    changePuzzle(nextIdx);
   }
 
   /* ============================================================
@@ -2873,6 +3252,30 @@
   }
 
   /* ============================================================
+     Рисование в редакторе — делегирование и защита от залипания
+     ============================================================ */
+  function paintEditorCellFromEvent(e) {
+    if (!editorMode || !painting) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (!el) return;
+    const cellEl = el.closest && el.closest('.cell.editor-cell');
+    if (!cellEl || cellEl.parentNode !== boardEl) return;
+
+    const rr = parseInt(cellEl.dataset.r, 10);
+    const cc = parseInt(cellEl.dataset.c, 10);
+    if (isNaN(rr) || isNaN(cc)) return;
+    if (editor.data[rr][cc] === editor.tool) return;
+
+    editor.data[rr][cc] = editor.tool;
+    applyEditorCellVisual(cellEl, editor.tool);
+    /* dataset сохраняется, но пересоздаём при необходимости */
+    cellEl.dataset.r = String(rr);
+    cellEl.dataset.c = String(cc);
+  }
+
+  function endPainting() { painting = false; }
+
+  /* ============================================================
      Обработчики
      ============================================================ */
   resetBtn.addEventListener('click', function () {
@@ -2882,10 +3285,51 @@
 
   undoBtn.addEventListener('click', undo);
   redoBtn.addEventListener('click', redo);
+  hintBtn.addEventListener('click', requestHint);
+
+  document.addEventListener('click', function (e) {
+    if (editorMode || galleryMode) return;
+    if (!hintFrom || !hintTo) return;
+    if (animating || solved) return;
+    if (mode !== 'idle') return;
+
+    const cellEl = e.target.closest && e.target.closest('.cell');
+    if (!cellEl) return;
+    if (cellEl.parentNode !== boardEl) return;
+
+    let idx = 0;
+    const children = boardEl.children;
+    for (let i = 0; i < children.length; i++) {
+      if (children[i] === cellEl) { idx = i; break; }
+    }
+    const showCoords = !editorMode;
+    const colsTotal = showCoords ? (COLS + 1) : COLS;
+    const rowIndex = Math.floor(idx / colsTotal);
+    const colIndex = idx - rowIndex * colsTotal;
+    let found;
+    if (showCoords) {
+      if (colIndex === 0) return;
+      found = [rowIndex, colIndex - 1];
+    } else {
+      found = [rowIndex, colIndex];
+    }
+    if (!found) return;
+    if (found[0] !== hintTo[0] || found[1] !== hintTo[1]) return;
+
+    const fr = hintFrom[0], fc = hintFrom[1];
+    const tr = hintTo[0], tc = hintTo[1];
+    const color = board[fr][fc];
+    if (!isKnight(color)) return;
+    if (board[tr][tc] !== '_') return;
+    if (!isKnightStep(fr, fc, tr, tc)) return;
+
+    commitMove(fr, fc, tr, tc, color, true);
+  });
 
   solveBtn.addEventListener('click', async function () {
     if (mode === 'searching') {
       searchGeneration++;
+      stopSearchProgress();
       mode = 'idle';
       updateButtons();
       setStatus('searchCancelled');
@@ -2897,11 +3341,10 @@
     const myGen = ++searchGeneration;
     mode = 'searching';
     updateButtons();
-    setStatus('searching');
+    startSearchProgress('search');
 
     await new Promise(r => setTimeout(r, 20));
 
-    const searchStart = performance.now();
     const startBoardCopy = board.map(row => row.slice());
     const goalBoardCopy  = GOAL.map(row => row.slice());
     let path = null, oom = false, unsolvable = false;
@@ -2910,15 +3353,15 @@
       path = await findSolution(myGen, function (dA, dB, found) {
         if (searchGeneration !== myGen) return;
         if (found) return;
-        const total   = dA + dB;
-        const elapsed = (performance.now() - searchStart) / 1000;
-        setStatus('searchingDepth', total, elapsed.toFixed(1));
+        lastDepthTotal = dA + dB;
       });
     } catch (e) {
       if (e && e.message === '__OOM__') oom = true;
       else if (e && e.message === '__UNSOLVABLE__') unsolvable = true;
       else throw e;
     }
+
+    stopSearchProgress();
 
     if (searchGeneration !== myGen) return;
     if (oom) {
@@ -2942,7 +3385,7 @@
     if (path.length === 0) {
       solved = isSolvedOn(board);
       mode = 'idle';
-      if (solved) setStatus('win'); else setStatus('moves');
+      if (solved) onSolved(); else setStatus('moves');
       updateButtons();
       return;
     }
@@ -2952,6 +3395,7 @@
       updateButtons();
       return;
     }
+    clearHint();
     setStatus('solutionFound', path.length);
     playPath(path);
   });
@@ -2959,6 +3403,7 @@
   editBtn.addEventListener('click', enterEditor);
   cancelBtn.addEventListener('click', exitEditor);
   runBtn.addEventListener('click', runEditedPuzzle);
+  deleteBtn.addEventListener('click', deleteEditedPuzzle);
 
   rotBtn.addEventListener('click', function () {
     editor.rotated = !editor.rotated;
@@ -3089,15 +3534,62 @@
   rowsInput.addEventListener('blur',   commitSize);
   colsInput.addEventListener('blur',   commitSize);
 
-  function endPainting() { painting = false; }
+  /* --- Рисование в редакторе: весь ввод через document и boardEl --- */
+  boardEl.addEventListener('mousedown', function (e) {
+    if (!editorMode) return;
+    if (e.button !== 0) return;
+    const cellEl = e.target.closest && e.target.closest('.cell.editor-cell');
+    if (!cellEl || cellEl.parentNode !== boardEl) return;
+
+    const rr = parseInt(cellEl.dataset.r, 10);
+    const cc = parseInt(cellEl.dataset.c, 10);
+    if (isNaN(rr) || isNaN(cc)) return;
+
+    painting = true;
+    if (editor.data[rr][cc] !== editor.tool) {
+      editor.data[rr][cc] = editor.tool;
+      applyEditorCellVisual(cellEl, editor.tool);
+      cellEl.dataset.r = String(rr);
+      cellEl.dataset.c = String(cc);
+    }
+    /* Отключаем native drag-and-drop выделения */
+    if (e.preventDefault) e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function (e) {
+    if (!editorMode) return;
+
+    /* Если зажатия нет — рисование прекращаем */
+    if (painting && (e.buttons & 1) === 0) {
+      painting = false;
+      return;
+    }
+
+    if (!painting) return;
+    paintEditorCellFromEvent(e);
+  });
+
   document.addEventListener('mouseup', endPainting);
   document.addEventListener('mouseleave', endPainting);
+  document.addEventListener('dragend', endPainting);
   window.addEventListener('mouseup', endPainting);
   window.addEventListener('blur', endPainting);
   document.addEventListener('touchend', endPainting);
   document.addEventListener('touchcancel', endPainting);
-  document.addEventListener('mousemove', function (e) {
-    if (painting && (e.buttons & 1) === 0) painting = false;
+
+  /* Резервный сброс: если за 300 мс после mousedown не пришло
+     ни одного mousemove с зажатой кнопкой — гасим painting. */
+  let paintingWatchdog = null;
+  boardEl.addEventListener('mousedown', function () {
+    if (!editorMode) return;
+    if (paintingWatchdog) clearTimeout(paintingWatchdog);
+    paintingWatchdog = setTimeout(function () {
+      if (!editorMode) return;
+      if (painting) {
+        /* Проверим — возможно, мышь уже отпущена */
+        painting = false;
+      }
+    }, 3000);
   });
 
   boardWrap.addEventListener('wheel', function (e) {
@@ -3122,13 +3614,13 @@
 
   langBtn.addEventListener('click', function () {
     lang = (lang === 'ru') ? 'en' : 'ru';
-    savePrefs();
+    saveGameState();
     applyLanguage();
   });
 
   themeBtn.addEventListener('click', function () {
     theme = (theme === 'dark') ? 'light' : 'dark';
-    savePrefs();
+    saveGameState();
     applyTheme();
   });
 
@@ -3140,11 +3632,37 @@
   /* ============================================================
      Старт
      ============================================================ */
-  loadPrefs();
-  applyTheme();
-  renderPuzzleSelect();
-  applyLanguage();
-  loadPuzzle(0);
+  (function start() {
+    rebuildPuzzlesFromStorage();
+
+    let restoredIdx = 0;
+
+    try {
+      const st = loadGameState();
+      if (st) {
+        if (st.lang === 'ru' || st.lang === 'en') lang = st.lang;
+        if (st.theme === 'dark' || st.theme === 'light') theme = st.theme;
+        if (typeof st.currentPuzzleIdx === 'number' &&
+            st.currentPuzzleIdx >= 0 &&
+            st.currentPuzzleIdx < PUZZLES.length) {
+          restoredIdx = st.currentPuzzleIdx;
+        }
+      } else {
+        const browserLang = (navigator.language ||
+                             navigator.userLanguage ||
+                             navigator.languages && navigator.languages[0] ||
+                             '').toLowerCase();
+        lang = browserLang.indexOf('ru') === 0 ? 'ru' : 'en';
+      }
+    } catch (e) {
+      lang = 'ru';
+    }
+
+    applyTheme();
+    renderPuzzleSelect();
+    applyLanguage();
+    loadPuzzle(restoredIdx);
+  })();
 })();
 </script>
 </body>
