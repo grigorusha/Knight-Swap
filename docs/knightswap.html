@@ -1,0 +1,3151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>♞ Обмен конями ♞</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 16px 34px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at 50% 0%, #7a86a8, #46506a 70%);
+    color: #e8ecf5;
+    overflow-x: auto;
+    transition: background .3s, color .3s;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h1 .kn-white {
+    color: #ffffff;
+    display: inline-block;
+    font-size: 26px;
+    line-height: 1;
+  }
+  h1 .kn-black {
+    color: #10141f;
+    display: inline-block;
+    transform: scaleX(-1);
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  #gameArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .picker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: #c0cadd;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-btn {
+    padding: 6px 12px;
+    font-size: 18px;
+    font-family: inherit;
+    background: #65718e;
+    color: #e8ecf5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+    box-shadow: inset 0 0 0 1px #7b88a9;
+    line-height: 1;
+  }
+  .nav-btn:hover:not(:disabled) { background: #7b88a9; }
+  .nav-btn:active:not(:disabled) { transform: scale(.94); }
+  .nav-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .gallery-open-btn {
+    padding: 7px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #55617e;
+    color: #e8ecf5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px #6b7899;
+    transition: background .15s, transform .1s;
+    white-space: nowrap;
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .gallery-open-btn:hover:not(:disabled) { background: #6b7899; }
+  .gallery-open-btn:active:not(:disabled) { transform: scale(.95); }
+  .gallery-open-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .gallery-open-btn .gallery-icon {
+    font-size: 16px;
+    line-height: 1;
+    display: inline-block;
+  }
+
+  select {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #5e6b8a;
+    background: #3f4a64;
+    color: #e8ecf5;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    min-width: 240px;
+  }
+  select:focus { border-color: #2f6df6; }
+  select optgroup {
+    font-style: normal;
+    font-weight: 700;
+    color: #a8c2ff;
+    background: #363f52;
+    padding-top: 4px;
+  }
+  select option {
+    background: #3f4a64;
+    color: #e8ecf5;
+    font-weight: 400;
+    padding-left: 18px;
+  }
+
+  .size-panel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: #c0cadd;
+    background: #3f4a64;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .fill-btn {
+    padding: 6px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #55617e;
+    color: #e8ecf5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px #6b7899;
+    transition: background .15s, transform .1s;
+    min-width: 40px;
+    line-height: 1.1;
+  }
+  .fill-btn:hover:not(:disabled) { background: #6b7899; }
+  .fill-btn:active:not(:disabled) { transform: scale(.95); }
+
+  .author-line {
+    font-size: 16px;
+    color: #cdd6ea;
+    text-align: center;
+    margin: -4px 0 -2px;
+    letter-spacing: .3px;
+    font-weight: 500;
+  }
+  .author-line .author-name {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .hint {
+    margin: 0;
+    max-width: 580px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #c0cadd;
+  }
+
+  #boardWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    margin: 6px 0;
+  }
+
+  #board {
+    --cell: 56px;
+    --gap: 8px;
+    display: grid;
+    gap: var(--gap);
+    padding: calc(var(--gap) + 4px);
+    border-radius: 18px;
+    background: #3f4a64;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .45),
+                inset 0 0 0 1px rgba(255, 255, 255, .1);
+    width: max-content;
+    position: relative;
+    transition: transform .45s cubic-bezier(.5, 0, .2, 1),
+                background-color .3s, box-shadow .3s;
+  }
+  #board.rotated {
+    transform: rotate(45deg);
+  }
+
+  .coord-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #a8b4d0;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+  }
+  .coord-label .label-text {
+    display: inline-block;
+    transition: transform .45s cubic-bezier(.5, 0, .2, 1);
+    will-change: transform;
+  }
+  #board.rotated .coord-label .label-text {
+    transform: rotate(-45deg);
+  }
+
+  .cell {
+    width: var(--cell);
+    height: var(--cell);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(var(--cell) * 0.92);
+    line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    transition: background-color .15s, box-shadow .15s;
+  }
+
+  .cell.off { background: transparent; }
+
+  .cell.empty {
+    background: #4f5b78;
+    box-shadow: inset 0 0 0 2px #5f6d8a;
+  }
+
+  .cell.empty.target {
+    background: #546388;
+    box-shadow: inset 0 0 0 2px #e8ecf5;
+    cursor: pointer;
+  }
+  .cell.empty.target::after {
+    content: "";
+    width: 26%;
+    height: 26%;
+    border-radius: 50%;
+    background: #e8ecf5;
+    box-shadow: 0 0 8px rgba(232, 236, 245, .85);
+  }
+  .cell.empty.target:hover { background: #5f6f95; }
+
+  .cell.knight {
+    background: #556590;
+    box-shadow: inset 0 0 0 2px #6b7ba5;
+    cursor: pointer;
+  }
+  .cell.knight:hover { background: #6272a0; }
+
+  .cell.knight.white {
+    color: #ffffff;
+    -webkit-text-stroke: 1.5px #12182a;
+    text-shadow: 0 0 2px #0b0f18;
+  }
+  .cell.knight.black {
+    color: #10141f;
+    -webkit-text-stroke: 1.5px #8ea0c8;
+    text-shadow: 0 0 2px #6f7fa8;
+  }
+  .cell.knight.red {
+    color: #e85a5a;
+    -webkit-text-stroke: 1.5px #4a1010;
+    text-shadow: 0 0 2px #080404;
+  }
+
+  .cell.knight.nomove { cursor: default; }
+  .cell.knight.nomove:hover { background: #556590; }
+
+  .cell.knight.selected {
+    background: #6474a0;
+    box-shadow: 0 0 0 3px #ffffff, 0 0 14px rgba(255, 255, 255, .55);
+    cursor: pointer;
+  }
+
+  .glyph {
+    display: inline-block;
+    transition: transform .45s cubic-bezier(.5, 0, .2, 1);
+    will-change: transform;
+  }
+  .cell.knight.white .glyph {
+    transform: scaleX(-1);
+  }
+  #board.rotated .cell.knight.white .glyph {
+    transform: rotate(-45deg) scaleX(-1);
+  }
+  #board.rotated .cell.knight.black .glyph,
+  #board.rotated .cell.knight.red .glyph {
+    transform: rotate(-45deg);
+  }
+
+  .cell.editor-cell {
+    cursor: pointer;
+  }
+  .cell.editor-cell:hover {
+    outline: 2px dashed #2f6df6;
+    outline-offset: -2px;
+  }
+  .cell.editor-cell.off {
+    background: #363f52;
+    box-shadow: inset 0 0 0 2px #4d5a76;
+    color: #6a7b9c;
+    font-size: calc(var(--cell) * 0.5);
+    -webkit-text-stroke: 0;
+    text-shadow: none;
+  }
+
+  #flyer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0;
+    font-size: 40px;
+    line-height: 1;
+  }
+  #flyer.animating {
+    transition: transform .4s cubic-bezier(.45, 0, .25, 1);
+  }
+
+  #status {
+    min-height: 24px;
+    font-size: 15px;
+    color: #c0cadd;
+    transition: color .2s;
+    text-align: center;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  #status.win {
+    color: #e8ecf5;
+    font-weight: 700;
+    animation: pop .45s cubic-bezier(.2, 1.6, .5, 1);
+  }
+  @keyframes pop {
+    from { transform: scale(.7); opacity: 0; }
+    to   { transform: scale(1);  opacity: 1; }
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .controls-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .moves-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+    max-width: 520px;
+  }
+  .moves-input {
+    flex: 1;
+    padding: 8px 12px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 13px;
+    background: #3f4a64;
+    color: #e8ecf5;
+    border: 1px solid #5e6b8a;
+    border-radius: 8px;
+    outline: none;
+    min-width: 0;
+    text-overflow: ellipsis;
+    transition: border-color .15s, background-color .3s, color .3s;
+  }
+  .moves-input:focus { border-color: #2f6df6; }
+  .moves-input::placeholder { color: #7b88a9; }
+
+  .icon-btn {
+    padding: 7px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #55617e;
+    color: #e8ecf5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px #6b7899;
+    transition: background .15s, transform .1s;
+    line-height: 1;
+    min-width: 34px;
+    flex-shrink: 0;
+  }
+  .icon-btn:hover:not(:disabled) { background: #6b7899; }
+  .icon-btn:active:not(:disabled) { transform: scale(.95); }
+  .icon-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2f6df6;
+    color: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background .15s, transform .1s, opacity .15s;
+  }
+  button:hover:not(:disabled)  { background: #4a80ff; }
+  button:active:not(:disabled) { transform: scale(.97); }
+  button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  button.secondary { background: #65718e; }
+  button.secondary:hover:not(:disabled) { background: #7b88a9; }
+
+  button.solve { background: #1d9e6e; }
+  button.solve:hover:not(:disabled) { background: #27bb84; }
+  button.solve.stop { background: #c94a3a; }
+  button.solve.stop:hover:not(:disabled) { background: #e05a4a; }
+
+  .editor-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: #3f4a64;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35),
+                inset 0 0 0 1px rgba(255, 255, 255, .1);
+    max-width: 680px;
+    transition: background-color .3s, box-shadow .3s;
+  }
+  .editor-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .editor-label {
+    font-size: 14px;
+    color: #c0cadd;
+    text-align: right;
+  }
+  .editor-panel input[type="number"],
+  .size-panel input[type="number"] {
+    width: 58px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    border: 1px solid #5e6b8a;
+    background: #363f52;
+    color: #e8ecf5;
+    font-size: 15px;
+    font-family: inherit;
+    text-align: center;
+    outline: none;
+  }
+  .editor-panel input[type="number"]:focus,
+  .size-panel input[type="number"]:focus { border-color: #2f6df6; }
+
+  .editor-panel input[type="text"] {
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid #5e6b8a;
+    background: #363f52;
+    color: #e8ecf5;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+  }
+  .editor-panel input[type="text"]:focus { border-color: #2f6df6; }
+
+  .editor-panel input[type="text"]#editor-name {
+    width: 180px;
+  }
+  .editor-panel input[type="text"]#editor-author {
+    width: 120px;
+  }
+
+  .editor-hint {
+    font-size: 13px;
+    color: #8a97b4;
+  }
+
+  .tool-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    background: #4f5b78;
+    box-shadow: inset 0 0 0 1px #5f6d8a;
+    color: #cdd6ea;
+  }
+  .tool-btn:hover:not(:disabled) { background: #5f6d8a; }
+  .tool-btn.active {
+    background: #2f6df6;
+    box-shadow: inset 0 0 0 1px #5a8bff, 0 0 12px rgba(47, 109, 246, .55);
+    color: #fff;
+  }
+  .tool-btn.icon-only {
+    padding: 6px 12px;
+    min-width: 44px;
+    font-size: 20px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tool-btn .t-white { color: #ffffff; }
+  .tool-btn .t-black { color: #10141f; }
+  .tool-btn .t-red   { color: #e85a5a; }
+  .tool-btn.icon-only .t-white {
+    color: #ffffff;
+    -webkit-text-stroke: 1.5px #12182a;
+    text-shadow: 0 0 2px #0b0f18;
+  }
+  .tool-btn.icon-only .t-black {
+    color: #10141f;
+    -webkit-text-stroke: 1.5px #8ea0c8;
+    text-shadow: 0 0 2px #6f7fa8;
+  }
+  .tool-btn.icon-only .t-red {
+    color: #e85a5a;
+    -webkit-text-stroke: 1.5px #4a1010;
+    text-shadow: 0 0 2px #080404;
+  }
+
+  /* ============================================================
+     Галерея
+     ============================================================ */
+  #galleryWrap {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 8px;
+  }
+  .gallery-topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .gallery-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #cdd6ea;
+    letter-spacing: .3px;
+  }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px) {
+    .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 700px) {
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 460px) {
+    .gallery-grid { grid-template-columns: 1fr; }
+  }
+
+  .gallery-author {
+    grid-column: 1 / -1;
+    font-size: 17px;
+    font-weight: 700;
+    color: #a8c2ff;
+    text-align: left;
+    padding: 8px 4px 2px;
+    border-bottom: 1px solid rgba(168, 194, 255, .2);
+    margin-bottom: 2px;
+  }
+  .gallery-author:first-child {
+    margin-top: 0;
+  }
+
+  .gallery-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 12px 8px;
+    border-radius: 12px;
+    background: #3f4a64;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1);
+    cursor: pointer;
+    transition: transform .15s, background .15s, box-shadow .15s;
+    user-select: none;
+  }
+  .gallery-tile:hover {
+    background: #4f5b78;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .3),
+                inset 0 0 0 1px rgba(255, 255, 255, .15);
+  }
+  .gallery-tile:active {
+    transform: translateY(0);
+  }
+  .gallery-tile.active-puzzle {
+    box-shadow: 0 0 0 2px #2f6df6,
+                inset 0 0 0 1px rgba(255, 255, 255, .15);
+  }
+  .gallery-tile-name {
+    font-size: 13px;
+    color: #cdd6ea;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .gallery-preview-wrap {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .gallery-preview {
+    display: grid;
+    border-radius: 6px;
+    background: #2a3348;
+    transform-origin: center center;
+  }
+  .gallery-preview.rotated .mini-glyph {
+    display: inline-block;
+    transform: rotate(-45deg);
+  }
+  .gallery-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    line-height: 1;
+    overflow: hidden;
+  }
+  .gallery-cell.off { background: transparent; }
+  .gallery-cell.empty { background: #4f5b78; }
+  .gallery-cell.knight { background: #556590; }
+  .gallery-cell.knight.white {
+    color: #ffffff;
+    -webkit-text-stroke: 0.8px #12182a;
+    text-shadow: none;
+  }
+  .gallery-cell.knight.black {
+    color: #10141f;
+    -webkit-text-stroke: 0.8px #8ea0c8;
+    text-shadow: none;
+  }
+  .gallery-cell.knight.red {
+    color: #e85a5a;
+    -webkit-text-stroke: 0.8px #4a1010;
+    text-shadow: none;
+  }
+
+  .info-lines {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #a8b3cb;
+    text-align: center;
+    line-height: 1.7;
+    max-width: 660px;
+  }
+  .info-lines a {
+    color: #a8c2ff;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(168, 194, 255, .5);
+    transition: color .15s, border-color .15s;
+  }
+  .info-lines a:hover {
+    color: #ccdcff;
+    border-bottom-color: #ccdcff;
+  }
+
+  .bottom-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .toggle-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    background: #65718e;
+    box-shadow: inset 0 0 0 1px #7b88a9;
+    color: #e8ecf5;
+  }
+  .toggle-btn:hover:not(:disabled) { background: #7b88a9; }
+
+  /* ============================================================
+     СВЕТЛАЯ ТЕМА
+     ============================================================ */
+  body.light {
+    background: #eef0f4;
+    color: #1a2030;
+  }
+  body.light h1 { color: #1a2030; }
+  body.light h1 .kn-white {
+    color: #ffffff;
+    -webkit-text-stroke: 1.2px #1a2030;
+    text-shadow: none;
+  }
+  body.light h1 .kn-black { color: #1a2030; }
+
+  body.light .picker { color: #4a5568; }
+  body.light select {
+    background: #ffffff;
+    color: #1a2030;
+    border-color: #c8d0e0;
+  }
+  body.light select optgroup {
+    color: #2f6df6;
+    background: #eef0f4;
+  }
+  body.light select option {
+    background: #ffffff;
+    color: #1a2030;
+  }
+
+  body.light .size-panel {
+    background: #ffffff;
+    color: #4a5568;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08);
+  }
+
+  body.light .fill-btn,
+  body.light .gallery-open-btn,
+  body.light .nav-btn,
+  body.light .toggle-btn {
+    background: #d0d6e2;
+    color: #1a2030;
+    box-shadow: inset 0 0 0 1px #b8c0d0;
+  }
+  body.light .fill-btn:hover:not(:disabled),
+  body.light .gallery-open-btn:hover:not(:disabled),
+  body.light .nav-btn:hover:not(:disabled),
+  body.light .toggle-btn:hover:not(:disabled) { background: #c0c8d8; }
+
+  body.light .author-line { color: #2f3a52; }
+  body.light .author-line .author-name { color: #0a1020; }
+  body.light .hint { color: #4a5568; }
+
+  body.light #board {
+    background: #ffffff;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .12),
+                inset 0 0 0 1px rgba(0, 0, 0, .08);
+  }
+  body.light .coord-label { color: #6a7590; }
+
+  body.light .moves-input {
+    background: #ffffff;
+    color: #1a2030;
+    border-color: #c8d0e0;
+  }
+  body.light .moves-input::placeholder { color: #9099b0; }
+  body.light .icon-btn {
+    background: #d0d6e2;
+    color: #1a2030;
+    box-shadow: inset 0 0 0 1px #b8c0d0;
+  }
+  body.light .icon-btn:hover:not(:disabled) { background: #c0c8d8; }
+
+  body.light .cell.empty {
+    background: #f0f2f6;
+    box-shadow: inset 0 0 0 2px #d8dde8;
+  }
+  body.light .cell.empty.target {
+    background: #e0f0e8;
+    box-shadow: inset 0 0 0 2px #2d8659;
+  }
+  body.light .cell.empty.target::after {
+    background: #2d8659;
+    box-shadow: 0 0 8px rgba(45, 134, 89, .6);
+  }
+  body.light .cell.empty.target:hover { background: #cce8d8; }
+
+  body.light .cell.knight {
+    background: #e8ecf5;
+    box-shadow: inset 0 0 0 2px #c8d0e0;
+  }
+  body.light .cell.knight:hover { background: #dde3ee; }
+  body.light .cell.knight.nomove:hover { background: #e8ecf5; }
+  body.light .cell.knight.selected {
+    background: #d8e0f0;
+    box-shadow: 0 0 0 3px #1a2030, 0 0 14px rgba(26, 32, 48, .25);
+  }
+
+  body.light .cell.knight.white {
+    color: #ffffff;
+    -webkit-text-stroke: 1.5px #1a2030;
+    text-shadow: none;
+  }
+  body.light .cell.knight.black {
+    color: #1a2030;
+    -webkit-text-stroke: 1px #c8d0e0;
+    text-shadow: none;
+  }
+  body.light .cell.knight.red {
+    color: #d04040;
+    -webkit-text-stroke: 1.5px #601010;
+    text-shadow: none;
+  }
+
+  body.light .cell.editor-cell.off {
+    background: #dde0e8;
+    box-shadow: inset 0 0 0 2px #c8d0e0;
+    color: #909aa8;
+  }
+
+  body.light #status { color: #4a5568; }
+  body.light #status.win { color: #1d7a4a; }
+
+  body.light button.secondary {
+    background: #d0d6e2;
+    color: #1a2030;
+  }
+  body.light button.secondary:hover:not(:disabled) {
+    background: #c0c8d8;
+  }
+  body.light button.solve {
+    background: #1d9e6e;
+    color: #fff;
+  }
+  body.light button.solve:hover:not(:disabled) { background: #27bb84; }
+  body.light button.solve.stop { background: #c94a3a; }
+  body.light button.solve.stop:hover:not(:disabled) { background: #e05a4a; }
+
+  body.light .editor-panel {
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .12),
+                inset 0 0 0 1px rgba(0, 0, 0, .08);
+  }
+  body.light .editor-label { color: #4a5568; }
+  body.light .editor-hint { color: #7a8098; }
+  body.light .editor-panel input[type="number"],
+  body.light .editor-panel input[type="text"],
+  body.light .size-panel input[type="number"] {
+    background: #f4f6fa;
+    color: #1a2030;
+    border-color: #c8d0e0;
+  }
+  body.light .tool-btn {
+    background: #e0e4ee;
+    color: #1a2030;
+    box-shadow: inset 0 0 0 1px #c8d0e0;
+  }
+  body.light .tool-btn:hover:not(:disabled) { background: #d0d6e2; }
+  body.light .tool-btn.active {
+    background: #2f6df6;
+    color: #fff;
+    box-shadow: inset 0 0 0 1px #5a8bff, 0 0 12px rgba(47, 109, 246, .35);
+  }
+  body.light .tool-btn .t-white { color: #ffffff; }
+  body.light .tool-btn .t-black { color: #1a2030; }
+  body.light .tool-btn .t-red   { color: #d04040; }
+
+  body.light .gallery-tile {
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08),
+                inset 0 0 0 1px rgba(0, 0, 0, .08);
+  }
+  body.light .gallery-tile:hover {
+    background: #f6f8fc;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .12),
+                inset 0 0 0 1px rgba(0, 0, 0, .1);
+  }
+  body.light .gallery-tile-name { color: #2f3a52; }
+  body.light .gallery-author { color: #2f6df6; border-bottom-color: rgba(47, 109, 246, .2); }
+  body.light .gallery-title { color: #1a2030; }
+  body.light .gallery-preview { background: #d8dde8; }
+  body.light .gallery-cell.empty { background: #eef0f4; }
+  body.light .gallery-cell.knight { background: #d8dee8; }
+  body.light .gallery-cell.knight.white {
+    color: #ffffff;
+    -webkit-text-stroke: 0.8px #1a2030;
+  }
+  body.light .gallery-cell.knight.black {
+    color: #1a2030;
+    -webkit-text-stroke: 0.8px #8a95ad;
+  }
+  body.light .gallery-cell.knight.red {
+    color: #d04040;
+    -webkit-text-stroke: 0.8px #601010;
+  }
+
+  body.light .info-lines { color: #4a5568; }
+  body.light .info-lines a { color: #2f6df6; border-bottom-color: rgba(47, 109, 246, .4); }
+  body.light .info-lines a:hover { color: #1a56e0; border-bottom-color: #1a56e0; }
+</style>
+</head>
+<body>
+
+  <h1><span class="kn-white">♞</span> <span id="h1Title">Обмен конями</span> <span class="kn-black">♞</span></h1>
+
+  <div id="gameArea">
+    <div class="picker" id="pickerRow">
+      <label for="puzzle" id="pickerLabel">Головоломка:</label>
+      <button id="prevPuzzle" class="nav-btn" title="Предыдущая">‹</button>
+      <select id="puzzle"></select>
+      <button id="nextPuzzle" class="nav-btn" title="Следующая">›</button>
+      <button id="galleryOpenBtn" class="gallery-open-btn">
+        <span class="gallery-icon">▦</span><span id="galleryBtnLabel">Галерея</span>
+      </button>
+    </div>
+
+    <p class="hint" id="hintEl"></p>
+
+    <div class="size-panel" id="sizePanel" style="display:none">
+      <span class="editor-label" id="lblSize">Размер:</span>
+      <input type="number" id="editor-rows" min="1" max="10" value="4">
+      <span>×</span>
+      <input type="number" id="editor-cols" min="1" max="10" value="5">
+      <span class="editor-hint" id="lblSizeHint">строки × столбцы (1–10)</span>
+    </div>
+
+    <div class="author-line" id="authorLine"></div>
+
+    <div id="boardWrap">
+      <div id="board">
+        <div id="flyer"></div>
+      </div>
+    </div>
+
+    <div id="status"></div>
+
+    <div class="controls" id="mainControls">
+      <div class="controls-row">
+        <button id="undo" class="secondary">↩ Ундо</button>
+        <button id="redo" class="secondary">↪ Редо</button>
+        <button id="reset" class="secondary">↺ Заново</button>
+      </div>
+      <div class="controls-row">
+        <button id="solve" class="solve">💡 Решить</button>
+        <button id="edit" class="secondary">✎ Редактировать</button>
+      </div>
+    </div>
+
+    <div class="moves-row" id="movesRow">
+      <input type="text" id="movesInput" class="moves-input" readonly
+             placeholder="A1-B3, C2-A1, …">
+      <button id="copyMovesBtn" class="icon-btn" title="Скопировать ходы">⧉</button>
+      <button id="pasteMovesBtn" class="icon-btn" title="Вставить и применить ходы">⤓</button>
+    </div>
+
+    <div class="editor-panel" id="editorPanel" style="display:none">
+      <div class="editor-row">
+        <span class="editor-label" id="lblName">Название:</span>
+        <input type="text" id="editor-name" placeholder="Новый уровень">
+        <span class="editor-label" id="lblAuthor">Автор:</span>
+        <input type="text" id="editor-author" placeholder="Gelo">
+      </div>
+
+      <div class="editor-row">
+        <span class="editor-label" id="lblBrush">Кисть:</span>
+        <button class="tool-btn icon-only" data-tool="x" id="toolX">✕</button>
+        <button class="tool-btn icon-only" data-tool="_" id="toolEmpty">◻</button>
+        <button class="tool-btn icon-only" data-tool="w" id="toolWhite"><span class="t-white">♞</span></button>
+        <button class="tool-btn icon-only" data-tool="b" id="toolBlack"><span class="t-black">♞</span></button>
+        <button class="tool-btn icon-only" data-tool="r" id="toolRed"><span class="t-red">♞</span></button>
+      </div>
+
+      <div class="editor-row">
+        <span class="editor-label" id="lblFill">Заполнить:</span>
+        <button id="fillX" class="fill-btn" title="Заполнить всё символами «×»">×</button>
+        <button id="fillEmpty" class="fill-btn" title="Заполнить всё пустыми клетками">◻</button>
+        <button id="editor-rotate" class="secondary">⟳ Повернуть 45°</button>
+      </div>
+
+      <div class="editor-row">
+        <button id="editor-copy" class="secondary">📋 Скопировать</button>
+        <button id="editor-paste" class="secondary">📋 Вставить</button>
+        <button id="editor-copy-all" class="secondary">📋 Скопировать все</button>
+      </div>
+
+      <div class="editor-row">
+        <button id="editor-run" class="solve">▶ Запустить</button>
+        <button id="editor-cancel" class="secondary">✕ Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="galleryWrap" style="display:none">
+    <div class="gallery-topbar">
+      <button id="galleryBack" class="gallery-open-btn">← Назад</button>
+      <h2 class="gallery-title" id="galleryTitle">Галерея головоломок</h2>
+    </div>
+    <div id="galleryContent"></div>
+  </div>
+
+  <div class="info-lines">
+    <span id="infoLine1">Автор головоломок и вдохновитель проекта: Gelo — </span><a href="https://vk.ru/geloart" target="_blank" rel="noopener noreferrer">https://vk.ru/geloart</a><br>
+    <span id="infoLine2">Разработчики: Deepseek + Grigorusha — </span><a href="https://github.com/grigorusha" target="_blank" rel="noopener noreferrer">https://github.com/grigorusha</a>
+  </div>
+
+  <div class="bottom-controls">
+    <button id="langBtn" class="toggle-btn">EN</button>
+    <button id="themeBtn" class="toggle-btn">☀ Светлая</button>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     Головоломки
+     ============================================================ */
+  const PUZZLES = [
+    /* gelo */
+    { name: 'Шесть на шесть', nameEn: 'Six by six', author: 'Gelo', rotated: false,
+      data: [['x','w','_','b','x'],['w','w','x','b','b'],['w','w','x','b','b'],['x','w','_','b','x']] },
+    { name: 'Эх вы, кони - 1', nameEn: 'Hey you, horses - 1', author: 'Gelo', rotated: false,
+      data: [['x','_','x'],['w','x','b'],['w','x','b'],['w','x','b'],['x','_','x']] },
+    { name: 'Эх вы, кони - 2', nameEn: 'Hey you, horses - 2', author: 'Gelo', rotated: false,
+      data: [['x','_','x'],['w','x','b'],['w','x','b'],['w','x','b'],['w','x','b'],['x','_','x']] },
+    { name: 'Кони привередливые - 1', author: 'Gelo', rotated: false,
+      data: [['x','x','_','x','x'],['w','w','x','b','b'],['w','w','x','b','b'],['x','x','_','x','x']] },
+    { name: 'Кони привередливые - 2', author: 'Gelo', rotated: false,
+      data: [['x','x','x','_','x','x','x'],['w','w','w','x','b','b','b'],['w','w','w','x','b','b','b'],['x','x','x','_','x','x','x']] },
+    { name: 'Шутка', nameEn: 'Joke', author: 'Gelo', rotated: true,
+      data: [['x','b','b','b','x'],['w','_','x','b','b'],['w','x','x','x','b'],['w','w','x','_','b'],['x','w','w','w','x']] },
+    { name: 'Кони в загоне', author: 'Gelo', rotated: false,
+      data: [['x','w','x','b','x'],['w','w','_','b','b'],['x','w','x','b','x'],['w','w','_','b','b'],['x','w','x','b','x']] },
+    { name: 'На переправе', author: 'Gelo', rotated: true,
+      data: [['x','x','x','b','x','x'],['x','x','x','b','b','x'],['x','x','_','b','b','b'],['w','w','w','_','x','x'],['x','w','w','x','x','x'],['x','x','w','x','x','x']] },
+    { name: 'Браслет', author: 'Gelo', rotated: true,
+      data: [['x','x','x','b','x'],['x','_','b','b','b'],['x','w','x','b','x'],['w','w','w','_','x'],['x','w','x','x','x']] },
+    { name: 'Браслет - 2', author: 'Gelo', rotated: true,
+      data: [['x','x','x','x','b','x','x'],['x','x','x','x','b','x','x'],['x','x','_','b','b','b','b'],['x','x','w','x','b','x','x'],['w','w','w','w','_','x','x'],['x','x','w','x','x','x','x'],['x','x','w','x','x','x','x']] },
+    { name: 'Мельница', author: 'Gelo', rotated: false,
+      data: [['x','x','x','b','x'],['w','w','_','b','x'],['x','w','x','b','x'],['x','w','_','b','b'],['x','w','x','x','x']] },
+    { name: 'Мельница - 2', author: 'Gelo', rotated: false,
+      data: [['x','x','x','x','b','x','x'],['x','x','x','x','b','x','x'],['w','w','w','_','b','x','x'],['x','x','w','x','b','x','x'],['x','x','w','_','b','b','b'],['x','x','w','x','x','x','x'],['x','x','w','x','x','x','x']] },
+    { name: 'Клин клином', author: 'Gelo', rotated: true,
+      data: [['b','b','b','x','x'],['b','b','_','x','x'],['b','_','w','w','w'],['x','x','w','w','x'],['x','x','w','x','x']] },
+    { name: 'Семь на семь', author: 'Gelo', rotated: false,
+      data: [['x','x','_','x','x'],['x','w','x','b','x'],['w','w','x','b','b'],['w','x','x','x','b'],['w','w','x','b','b'],['x','w','x','b','x'],['x','x','_','x','x']] },
+    { name: 'S', author: 'Gelo', rotated: false,
+      data: [['w','w','_','x'],['w','x','x','x'],['w','w','b','b'],['x','x','x','b'],['x','_','b','b']] },
+    { name: 'Кулон', author: 'Gelo', rotated: true,
+      data: [['x','x','b','b','b'],['x','x','_','x','b'],['w','_','x','x','b'],['w','x','x','_','x'],['w','w','w','x','x']] },
+    { name: 'Карусели', author: 'Gelo', rotated: true,
+      data: [['x','x','x','x','b','b','x'],['x','x','x','b','x','_','b'],['x','x','x','b','x','x','b'],['x','w','w','x','b','b','x'],['w','x','x','w','x','x','x'],['w','_','x','w','x','x','x'],['x','w','w','x','x','x','x']] },
+    { name: 'Пополнение X', author: 'Gelo', rotated: false,
+      data: [['x','x','w','w','_','b','b','x','x'],['r','x','w','x','x','x','b','x','r'],['x','x','w','w','_','b','b','x','x']] },
+    { name: 'S-мини', nameEn: 'S-mini', author: 'Gelo', rotated: false,
+      data: [['b','b','b'],['_','x','x'],['r','r','r'],['x','x','_'],['w','w','w']] },
+
+    /* grigr */
+    { name: 'Вертикаль - 1', nameEn: 'Vertical - 1', author: 'Grigr', rotated: false,
+      data: [['w','_','b'],['w','_','b'],['w','_','b'],['w','_','b']] },
+    { name: 'Вертикаль - 2', nameEn: 'Vertical - 2', author: 'Grigr', rotated: false,
+      data: [['w','w','b'],['w','_','b'],['w','_','b'],['w','b','b']] },
+    { name: 'Крест X', nameEn: 'Cross X', author: 'Grigr', rotated: true,
+      data: [['w','w','x','b','b'],['w','w','x','b','b'],['x','_','_','_','x'],['w','w','x','b','b'],['w','w','x','b','b']] },
+    { name: 'Манеж', author: 'Grigr', rotated: false,
+      data: [['x','w','w','b','x'],['w','w','_','b','b'],['w','w','x','b','b'],['w','w','_','b','b'],['x','w','b','b','x']] },
+    { name: 'Манеж - 2', author: 'Grigr', rotated: false,
+      data: [['x','w','w','b','x'],['w','w','w','b','b'],['w','w','_','b','b'],['w','w','b','b','b'],['x','w','b','b','x']] },
+    { name: 'Табун', author: 'Grigr', rotated: true,
+      data: [['w','r','r','r','r'],['r','r','r','r','r'],['r','r','_','r','r'],['r','r','r','r','r'],['r','r','r','r','b']] },
+    { name: 'Хоровод', author: 'Grigr', rotated: false,
+      data: [['x','w','x','x','x','x','x'],['x','r','r','r','r','r','b'],['x','r','r','r','r','r','x'],['x','r','r','_','r','r','x'],['x','r','r','r','r','r','x'],['b','r','r','r','r','r','x'],['x','x','x','x','x','w','x']] },
+
+    /* public */
+    { name: '3x3', author: 'Public', rotated: false,
+      data: [['w','_','w'],['_','_','_'],['b','_','b']] },
+    { name: '3x4', author: 'Public', rotated: false,
+      data: [['w','w','w'],['_','_','_'],['_','_','_'],['b','b','b']] },
+    { name: '4x4', author: 'Public', rotated: false,
+      data: [['x','w','x','x'],['x','_','_','x'],['x','_','w','_'],['b','_','b','_']] }
+  ];
+
+  /* ============================================================
+     Словарь
+     ============================================================ */
+  const STR = {
+    ru: {
+      title: 'Обмен конями',
+      pickerLabel: 'Головоломка:',
+      hintPlay:
+        'Цель — поменять белых и чёрных коней местами,<br>' +
+        'красные пони должны вернуться на свои места.',
+      hintEdit:
+        'Редактор: выберите кисть и кликайте по клеткам (можно вести мышью).<br>' +
+        'Задайте имя и размер, поверните поле и нажмите «Запустить».',
+      authorLabel: 'Уровень:',
+      authorOf: 'Автор:',
+      moves: 'Ходов:',
+      winMessage: function (n, p) { return '🎉 Победа! Все кони поменялись местами за ' + n + ' ' + p + '.'; },
+      searching: 'Ищу решение…',
+      searchingDepth: function (d, p, t) { return 'Ищу решение… глубина: ' + d + ' ' + p + '. время ' + t + ' сек…'; },
+      playingPath: function (i, m) { return 'Решение: ' + i + ' / ' + m + '…'; },
+      searchCancelled: 'Поиск отменён',
+      tooHard: function (n) { return 'Уровень слишком сложный: превышен лимит состояний (' + n + ').'; },
+      unsolvable: 'Решение не найдено: уровня нельзя достичь из текущей позиции. Проверьте расстановку — количество белых и чёрных коней должно совпадать, и между стартом и целью должен существовать путь по ходам коня.',
+      searchAborted: 'Поиск прерван.',
+      solutionFound: function (n, p) { return 'Решение: ' + n + ' ' + p + '. Проигрываю…'; },
+      internalError: 'Внутренняя ошибка поиска. Попробуйте ещё раз.',
+      btnUndo: '↩ Ундо', btnRedo: '↪ Редо', btnReset: '↺ Заново',
+      btnSolve: '💡 Решить', btnStop: '⏹ Стоп', btnEdit: '✎ Редактировать',
+      lblName: 'Название:', lblAuthor: 'Автор:',
+      lblSize: 'Размер:', lblSizeHint: 'строки × столбцы (1–10)',
+      lblFill: 'Заполнить:', lblBrush: 'Кисть:',
+      toolXTitle: 'Нет клетки (вне поля)',
+      toolEmptyTitle: 'Пустая клетка',
+      toolWhiteTitle: 'Белый конь',
+      toolBlackTitle: 'Чёрный конь',
+      toolRedTitle: 'Красный конь',
+      fillXTitle: 'Заполнить всё символами «×»',
+      fillEmptyTitle: 'Заполнить всё пустыми клетками',
+      btnRotate: '⟳ Повернуть 45°',
+      btnRotateBack: '⟲ Повернуть назад',
+      btnCopy: '📋 Скопировать', btnPaste: '📋 Вставить', btnCopyAll: '📋 Скопировать все',
+      btnRun: '▶ Запустить', btnCancel: '✕ Отмена',
+      copyOk: '✓ Скопировано', copyFail: '⚠ Не удалось',
+      pasteOk: '✓ Вставлено', pasteFail: '⚠ Ошибка',
+      errEmptyPuzzle: 'Поставьте хотя бы одного белого и одного чёрного коня.',
+      warnUnbalanced: function (w, b) { return 'Внимание: белых (' + w + ') и чёрных (' + b + ') коней разное количество — цель недостижима.'; },
+      infoLine1: 'Автор головоломок и вдохновитель проекта: Gelo — ',
+      infoLine2: 'Разработчики: Deepseek + Grigorusha — ',
+      btnLang: 'EN',
+      btnThemeDark: '☀ Светлая', btnThemeLight: '🌙 Тёмная',
+      moveOne: 'ход', moveFew: 'хода', moveMany: 'ходов',
+      stepOne: 'шаг', stepFew: 'шага', stepMany: 'шагов',
+      placeholderName: 'Новый уровень', defaultName: 'Новый уровень',
+      movesPlaceholder: 'A1-B3, C2-A1, …',
+      copyMovesTitle: 'Скопировать ходы', pasteMovesTitle: 'Вставить и применить ходы',
+      galleryOpen: 'Галерея', galleryTitle: 'Галерея головоломок', galleryBack: '← Назад',
+      copyAllOk: '✓ Скопированы все головоломки', copyAllFail: '⚠ Не удалось скопировать'
+    },
+    en: {
+      title: 'Knight Swap',
+      pickerLabel: 'Puzzle:',
+      hintPlay: 'Goal — swap white and black knights,<br>red ponies must return to their starting squares.',
+      hintEdit: 'Editor: pick a brush and click cells (drag to paint).<br>Set the name and size, rotate if needed, then press "Start".',
+      authorLabel: 'Level:', authorOf: 'Author:', moves: 'Moves:',
+      winMessage: function (n, p) { return '🎉 Victory! All knights swapped in ' + n + ' ' + p + '.'; },
+      searching: 'Searching for a solution…',
+      searchingDepth: function (d, p, t) { return 'Searching… depth: ' + d + ' ' + p + '. time ' + t + ' s…'; },
+      playingPath: function (i, m) { return 'Solution: ' + i + ' / ' + m + '…'; },
+      searchCancelled: 'Search cancelled',
+      tooHard: function (n) { return 'Level is too complex: state limit exceeded (' + n + ').'; },
+      unsolvable: 'No solution: the goal cannot be reached from the current position. Check the layout — white and black knight counts must match, and a knight-move path must exist between start and goal.',
+      searchAborted: 'Search aborted.',
+      solutionFound: function (n, p) { return 'Solution: ' + n + ' ' + p + '. Playing back…'; },
+      internalError: 'Internal search error. Please try again.',
+      btnUndo: '↩ Undo', btnRedo: '↪ Redo', btnReset: '↺ Reset',
+      btnSolve: '💡 Solve', btnStop: '⏹ Stop', btnEdit: '✎ Edit',
+      lblName: 'Name:', lblAuthor: 'Author:',
+      lblSize: 'Size:', lblSizeHint: 'rows × cols (1–10)',
+      lblFill: 'Fill:', lblBrush: 'Brush:',
+      toolXTitle: 'No cell (outside board)',
+      toolEmptyTitle: 'Empty cell',
+      toolWhiteTitle: 'White knight',
+      toolBlackTitle: 'Black knight',
+      toolRedTitle: 'Red knight',
+      fillXTitle: 'Fill all cells with "×"',
+      fillEmptyTitle: 'Fill all cells as empty',
+      btnRotate: '⟳ Rotate 45°', btnRotateBack: '⟲ Rotate back',
+      btnCopy: '📋 Copy', btnPaste: '📋 Paste', btnCopyAll: '📋 Copy all',
+      btnRun: '▶ Start', btnCancel: '✕ Cancel',
+      copyOk: '✓ Copied', copyFail: '⚠ Failed',
+      pasteOk: '✓ Pasted', pasteFail: '⚠ Failed',
+      errEmptyPuzzle: 'Place at least one white and one black knight.',
+      warnUnbalanced: function (w, b) { return 'Warning: whites (' + w + ') and blacks (' + b + ') count mismatch — the goal is unreachable.'; },
+      infoLine1: 'Puzzle author and project inspirer: Gelo — ',
+      infoLine2: 'Developers: Deepseek + Grigorusha — ',
+      btnLang: 'RU',
+      btnThemeDark: '☀ Light', btnThemeLight: '🌙 Dark',
+      moveOne: 'move', moveFew: 'moves', moveMany: 'moves',
+      stepOne: 'step', stepFew: 'steps', stepMany: 'steps',
+      placeholderName: 'New level', defaultName: 'New level',
+      movesPlaceholder: 'A1-B3, C2-A1, …',
+      copyMovesTitle: 'Copy moves', pasteMovesTitle: 'Paste and apply moves',
+      galleryOpen: 'Gallery', galleryTitle: 'Puzzle gallery', galleryBack: '← Back',
+      copyAllOk: '✓ All puzzles copied', copyAllFail: '⚠ Failed to copy'
+    }
+  };
+
+  let lang  = 'ru';
+  let theme = 'dark';
+
+  function t(key) { return STR[lang][key]; }
+
+  function fmtMoves(n) {
+    if (lang === 'en') return n === 1 ? t('moveOne') : t('moveMany');
+    const d = n % 10, dd = n % 100;
+    if (d === 1 && dd !== 11) return t('moveOne');
+    if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return t('moveFew');
+    return t('moveMany');
+  }
+  function fmtSteps(n) {
+    if (lang === 'en') return n === 1 ? t('stepOne') : t('stepMany');
+    const d = n % 10, dd = n % 100;
+    if (d === 1 && dd !== 11) return t('stepOne');
+    if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return t('stepFew');
+    return t('stepMany');
+  }
+
+  const KNIGHT_STEPS = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+  const ANIM_MS = 400;
+  const STEP_MS = 500;
+  const MAX_STATES = 20000000;
+  const MAX_ITER   = 100000;
+  const NUM_LIMIT = 26;
+  const BIG_LIMIT = 32;
+  const LETTERS = 'ABCDEFGHIJ';
+  const LABEL_SIZE = 14;
+
+  /* ============================================================
+     DOM
+     ============================================================ */
+  const gameArea     = document.getElementById('gameArea');
+  const boardEl      = document.getElementById('board');
+  const boardWrap    = document.getElementById('boardWrap');
+  const flyer        = document.getElementById('flyer');
+  const statusEl     = document.getElementById('status');
+  const hintEl       = document.getElementById('hintEl');
+  const authorLine   = document.getElementById('authorLine');
+  const pickerRow    = document.getElementById('pickerRow');
+  const pickerLabel  = document.getElementById('pickerLabel');
+  const h1Title      = document.getElementById('h1Title');
+  const puzzleSel    = document.getElementById('puzzle');
+  const prevPuzzleBtn= document.getElementById('prevPuzzle');
+  const nextPuzzleBtn= document.getElementById('nextPuzzle');
+  const galleryOpenBtn = document.getElementById('galleryOpenBtn');
+  const galleryBtnLabel = document.getElementById('galleryBtnLabel');
+  const galleryWrap  = document.getElementById('galleryWrap');
+  const galleryContent = document.getElementById('galleryContent');
+  const galleryBack  = document.getElementById('galleryBack');
+  const galleryTitle = document.getElementById('galleryTitle');
+  const sizePanel    = document.getElementById('sizePanel');
+  const mainControls = document.getElementById('mainControls');
+  const movesRow     = document.getElementById('movesRow');
+  const movesInput   = document.getElementById('movesInput');
+  const copyMovesBtn = document.getElementById('copyMovesBtn');
+  const pasteMovesBtn= document.getElementById('pasteMovesBtn');
+  const editorPanel  = document.getElementById('editorPanel');
+  const undoBtn      = document.getElementById('undo');
+  const redoBtn      = document.getElementById('redo');
+  const resetBtn     = document.getElementById('reset');
+  const solveBtn     = document.getElementById('solve');
+  const editBtn      = document.getElementById('edit');
+  const nameInput    = document.getElementById('editor-name');
+  const authorInput  = document.getElementById('editor-author');
+  const rowsInput    = document.getElementById('editor-rows');
+  const colsInput    = document.getElementById('editor-cols');
+  const rotBtn       = document.getElementById('editor-rotate');
+  const copyBtn      = document.getElementById('editor-copy');
+  const pasteBtn     = document.getElementById('editor-paste');
+  const copyAllBtn   = document.getElementById('editor-copy-all');
+  const runBtn       = document.getElementById('editor-run');
+  const cancelBtn    = document.getElementById('editor-cancel');
+  const fillXBtn     = document.getElementById('fillX');
+  const fillEmptyBtn = document.getElementById('fillEmpty');
+  const lblName      = document.getElementById('lblName');
+  const lblAuthor    = document.getElementById('lblAuthor');
+  const lblSize      = document.getElementById('lblSize');
+  const lblSizeHint  = document.getElementById('lblSizeHint');
+  const lblFill      = document.getElementById('lblFill');
+  const lblBrush     = document.getElementById('lblBrush');
+  const toolX        = document.getElementById('toolX');
+  const toolEmpty    = document.getElementById('toolEmpty');
+  const toolWhite    = document.getElementById('toolWhite');
+  const toolBlack    = document.getElementById('toolBlack');
+  const toolRed      = document.getElementById('toolRed');
+  const infoLine1    = document.getElementById('infoLine1');
+  const infoLine2    = document.getElementById('infoLine2');
+  const langBtn      = document.getElementById('langBtn');
+  const themeBtn     = document.getElementById('themeBtn');
+
+  const DEFAULT_AUTHOR = 'Gelo';
+
+  /* ============================================================
+     Состояние игры
+     ============================================================ */
+  let START, GOAL, ROWS, COLS, rotated;
+  let currentName = '', currentNameEn = '', currentAuthor = '';
+  let currentPuzzleIdx = 0;
+  let cells, cellIndex, neighbors, N;
+  let POW4, POW4_BIG;
+  let board, selected, targets, moves, solved;
+  let timeline, cursor;
+  let mode = 'idle';
+  let animating = false;
+  let playbackId = 0;
+  let playbackTimer = null;
+  let searchGeneration = 0;
+
+  let statusState = { key: 'moves', args: [] };
+
+  let editorMode = false;
+  let galleryMode = false;
+  let editorSourceIdx = -1;
+  const editor = {
+    rows: 4, cols: 5, data: [], tool: 'w', rotated: false,
+    name: 'Новый уровень', author: DEFAULT_AUTHOR
+  };
+  let editorCells = [];
+  let painting = false;
+
+  /* ============================================================
+     Вспомогательные
+     ============================================================ */
+  const isInside   = (r, c) => r >= 0 && r < ROWS && c >= 0 && c < COLS;
+  const isPlayable = (r, c) => isInside(r, c) && START[r][c] !== 'x';
+  const isKnight   = v => v === 'w' || v === 'b' || v === 'r';
+
+  function getTargets(r, c) {
+    const res = [];
+    for (let i = 0; i < KNIGHT_STEPS.length; i++) {
+      const nr = r + KNIGHT_STEPS[i][0];
+      const nc = c + KNIGHT_STEPS[i][1];
+      if (isPlayable(nr, nc) && board[nr][nc] === '_') res.push([nr, nc]);
+    }
+    return res;
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function getLocalName(p) {
+    if (lang === 'en' && p.nameEn) return p.nameEn;
+    return p.name;
+  }
+
+  function countKnights(data) {
+    let w = 0, b = 0, r = 0;
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].length; j++) {
+        const v = data[i][j];
+        if (v === 'w') w++;
+        else if (v === 'b') b++;
+        else if (v === 'r') r++;
+      }
+    }
+    return { w: w, b: b, r: r };
+  }
+
+  function cellToNotation(r, c) { return LETTERS[c] + String(ROWS - r); }
+
+  function parseSquare(s) {
+    if (s.length < 2) return null;
+    const c = LETTERS.indexOf(s[0].toUpperCase());
+    if (c < 0 || c >= COLS) return null;
+    const num = parseInt(s.substring(1), 10);
+    if (isNaN(num)) return null;
+    const r = ROWS - num;
+    if (r < 0 || r >= ROWS) return null;
+    return [r, c];
+  }
+
+  function isKnightStep(r1, c1, r2, c2) {
+    const dr = Math.abs(r2 - r1);
+    const dc = Math.abs(c2 - c1);
+    return (dr === 1 && dc === 2) || (dr === 2 && dc === 1);
+  }
+
+  /* ============================================================
+     Статус
+     ============================================================ */
+  function setStatus(key, ...args) {
+    statusState.key = key;
+    statusState.args = args;
+    renderStatus();
+  }
+
+  function renderStatus() {
+    const s = STR[lang];
+    let text = '';
+    switch (statusState.key) {
+      case 'moves': text = s.moves + ' ' + moves; break;
+      case 'win': text = s.winMessage(moves, fmtMoves(moves)); break;
+      case 'searching': text = s.searching; break;
+      case 'searchingDepth':
+        text = s.searchingDepth(statusState.args[0],
+          fmtSteps(statusState.args[0]), statusState.args[1]);
+        break;
+      case 'playingPath':
+        text = s.playingPath(statusState.args[0], statusState.args[1]);
+        break;
+      case 'searchCancelled': text = s.searchCancelled; break;
+      case 'tooHard': text = s.tooHard(statusState.args[0]); break;
+      case 'unsolvable': text = s.unsolvable; break;
+      case 'searchAborted': text = s.searchAborted; break;
+      case 'solutionFound':
+        text = s.solutionFound(statusState.args[0],
+          fmtMoves(statusState.args[0]));
+        break;
+      case 'internalError': text = s.internalError; break;
+      case 'errEmptyPuzzle': text = s.errEmptyPuzzle; break;
+      case 'warnUnbalanced':
+        text = s.warnUnbalanced(statusState.args[0], statusState.args[1]);
+        break;
+      default: text = '';
+    }
+    statusEl.textContent = text;
+    statusEl.classList.toggle('win', statusState.key === 'win');
+  }
+
+  /* ============================================================
+     Язык и тема
+     ============================================================ */
+  function applyLanguage() {
+    document.documentElement.lang = lang;
+    document.title = '♞ ' + t('title') + ' ♞';
+    h1Title.textContent   = t('title');
+    pickerLabel.textContent = t('pickerLabel');
+    hintEl.innerHTML      = t('hintPlay');
+    lblName.textContent   = t('lblName');
+    lblAuthor.textContent = t('lblAuthor');
+    lblSize.textContent   = t('lblSize');
+    lblSizeHint.textContent = t('lblSizeHint');
+    lblFill.textContent   = t('lblFill');
+    lblBrush.textContent  = t('lblBrush');
+    copyBtn.textContent   = t('btnCopy');
+    pasteBtn.textContent  = t('btnPaste');
+    copyAllBtn.textContent = t('btnCopyAll');
+    runBtn.textContent    = t('btnRun');
+    cancelBtn.textContent = t('btnCancel');
+    undoBtn.textContent   = t('btnUndo');
+    redoBtn.textContent   = t('btnRedo');
+    resetBtn.textContent  = t('btnReset');
+    editBtn.textContent   = t('btnEdit');
+    infoLine1.textContent = t('infoLine1');
+    infoLine2.textContent = t('infoLine2');
+    nameInput.placeholder = t('placeholderName');
+    langBtn.textContent   = t('btnLang');
+    themeBtn.textContent  = (theme === 'dark') ? t('btnThemeDark') : t('btnThemeLight');
+    galleryBtnLabel.textContent = t('galleryOpen');
+    galleryTitle.textContent    = t('galleryTitle');
+    galleryBack.textContent     = t('galleryBack');
+
+    toolX.title      = t('toolXTitle');
+    toolEmpty.title  = t('toolEmptyTitle');
+    toolWhite.title  = t('toolWhiteTitle');
+    toolBlack.title  = t('toolBlackTitle');
+    toolRed.title    = t('toolRedTitle');
+    fillXBtn.title   = t('fillXTitle');
+    fillEmptyBtn.title = t('fillEmptyTitle');
+
+    movesInput.placeholder = t('movesPlaceholder');
+    copyMovesBtn.title    = t('copyMovesTitle');
+    pasteMovesBtn.title   = t('pasteMovesTitle');
+
+    updateSolveButton();
+    updateRotateButton();
+    updateAuthorLine();
+    renderStatus();
+    renderPuzzleSelect();
+
+    if (editorMode) hintEl.innerHTML = t('hintEdit');
+    if (galleryMode) renderGallery();
+  }
+
+  function applyTheme() {
+    document.body.classList.toggle('light', theme === 'light');
+    themeBtn.textContent = (theme === 'dark') ? t('btnThemeDark') : t('btnThemeLight');
+  }
+
+  function savePrefs() {
+    try {
+      localStorage.setItem('knightSwap_lang', lang);
+      localStorage.setItem('knightSwap_theme', theme);
+    } catch (e) {}
+  }
+  function loadPrefs() {
+    try {
+      const savedLang = localStorage.getItem('knightSwap_lang');
+      if (savedLang === 'ru' || savedLang === 'en') {
+        lang = savedLang;
+      } else {
+        const browserLang = (navigator.language ||
+                             navigator.userLanguage ||
+                             navigator.languages && navigator.languages[0] ||
+                             '').toLowerCase();
+        lang = browserLang.indexOf('ru') === 0 ? 'ru' : 'en';
+      }
+      const th = localStorage.getItem('knightSwap_theme');
+      if (th === 'dark' || th === 'light') theme = th;
+    } catch (e) {}
+  }
+
+  /* ============================================================
+     Строка ходов
+     ============================================================ */
+  function updateMovesText() {
+    const parts = [];
+    for (let i = 1; i <= cursor; i++) {
+      const m = timeline[i] && timeline[i].move;
+      if (!m) continue;
+      parts.push(cellToNotation(m.from[0], m.from[1]) + '-' +
+                 cellToNotation(m.to[0],   m.to[1]));
+    }
+    movesInput.value = parts.join(', ');
+  }
+
+  /* ============================================================
+     Галерея
+     ============================================================ */
+  function openGallery() {
+    if (editorMode) return;
+    stopAllActivity();
+    galleryMode = true;
+    gameArea.style.display = 'none';
+    galleryWrap.style.display = 'block';
+    renderGallery();
+  }
+
+  function closeGallery() {
+    galleryMode = false;
+    galleryWrap.style.display = 'none';
+    gameArea.style.display = '';
+  }
+
+  function renderGallery() {
+    galleryContent.innerHTML = '';
+    const grid = document.createElement('div');
+    grid.className = 'gallery-grid';
+
+    const byAuthor = {};
+    const order = [];
+    for (let i = 0; i < PUZZLES.length; i++) {
+      const a = PUZZLES[i].author || DEFAULT_AUTHOR;
+      if (!byAuthor[a]) { byAuthor[a] = []; order.push(a); }
+      byAuthor[a].push(i);
+    }
+
+    for (let a = 0; a < order.length; a++) {
+      const author = order[a];
+      const indices = byAuthor[author];
+
+      const h = document.createElement('div');
+      h.className = 'gallery-author';
+      h.textContent = author;
+      grid.appendChild(h);
+
+      for (let k = 0; k < indices.length; k++) {
+        const idx = indices[k];
+        const p = PUZZLES[idx];
+        const tile = document.createElement('div');
+        tile.className = 'gallery-tile';
+        if (idx === currentPuzzleIdx) tile.classList.add('active-puzzle');
+
+        const wrap = document.createElement('div');
+        wrap.className = 'gallery-preview-wrap';
+        const preview = document.createElement('div');
+        preview.className = 'gallery-preview';
+        if (p.rotated) preview.classList.add('rotated');
+
+        const rows = p.data.length;
+        const cols = p.data[0].length;
+        const maxDim = Math.max(rows, cols);
+        const cellSize = Math.max(6, Math.min(11, Math.floor(90 / maxDim)));
+        const gap = 1;
+        const padding = 4;
+
+        preview.style.gridTemplateColumns = 'repeat(' + cols + ', ' + cellSize + 'px)';
+        preview.style.gap = gap + 'px';
+        preview.style.padding = padding + 'px';
+
+        const flatW = cellSize * cols + gap * (cols - 1) + 2 * padding;
+        const flatH = cellSize * rows + gap * (rows - 1) + 2 * padding;
+        const flatSize = Math.max(flatW, flatH);
+
+        if (p.rotated) {
+          const needed = flatSize * Math.SQRT2;
+          const target = 140;
+          const scale = needed <= target ? 1 : target / needed;
+          preview.style.transform = 'rotate(45deg) scale(' + scale.toFixed(3) + ')';
+        }
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'gallery-cell';
+            const v = p.data[r][c];
+            cell.style.width = cellSize + 'px';
+            cell.style.height = cellSize + 'px';
+            cell.style.fontSize = Math.floor(cellSize * 0.9) + 'px';
+            if (v === 'x') cell.classList.add('off');
+            else if (v === '_') cell.classList.add('empty');
+            else {
+              const cls = v === 'w' ? 'white' : v === 'b' ? 'black' : 'red';
+              cell.classList.add('knight', cls);
+              const span = document.createElement('span');
+              span.className = 'mini-glyph';
+              span.textContent = '♞';
+              cell.appendChild(span);
+            }
+            preview.appendChild(cell);
+          }
+        }
+
+        wrap.appendChild(preview);
+        tile.appendChild(wrap);
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'gallery-tile-name';
+        nameEl.textContent = getLocalName(p);
+        nameEl.title = getLocalName(p);
+        tile.appendChild(nameEl);
+
+        (function (puzzleIdx) {
+          tile.addEventListener('click', function () {
+            closeGallery();
+            changePuzzle(puzzleIdx);
+          });
+        })(idx);
+
+        grid.appendChild(tile);
+      }
+    }
+    galleryContent.appendChild(grid);
+  }
+
+  /* ============================================================
+     Загрузка головоломки
+     ============================================================ */
+  function loadPuzzleData(p, idx) {
+    START   = p.data.map(row => row.slice());
+    ROWS    = START.length;
+    COLS    = START[0].length;
+    rotated = !!p.rotated;
+    currentName   = p.name || '';
+    currentNameEn = p.nameEn || p.name || '';
+    currentAuthor = p.author || DEFAULT_AUTHOR;
+    if (typeof idx === 'number') currentPuzzleIdx = idx;
+
+    updateAuthorLine();
+
+    GOAL = START.map(row => row.map(v => v === 'w' ? 'b' : v === 'b' ? 'w' : v));
+
+    cells = [];
+    cellIndex = new Map();
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (START[r][c] !== 'x') {
+          cellIndex.set(r + ',' + c, cells.length);
+          cells.push([r, c]);
+        }
+      }
+    }
+    N = cells.length;
+
+    neighbors = new Array(N);
+    for (let i = 0; i < N; i++) {
+      const r = cells[i][0], c = cells[i][1];
+      const list = [];
+      for (let k = 0; k < KNIGHT_STEPS.length; k++) {
+        const key = (r + KNIGHT_STEPS[k][0]) + ',' + (c + KNIGHT_STEPS[k][1]);
+        if (cellIndex.has(key)) list.push(cellIndex.get(key));
+      }
+      neighbors[i] = list;
+    }
+
+    POW4 = new Array(N);
+    let p4 = 1;
+    for (let i = 0; i < N; i++) { POW4[i] = p4; p4 *= 4; }
+
+    POW4_BIG = new Array(N);
+    let p4b = 1n;
+    for (let i = 0; i < N; i++) { POW4_BIG[i] = p4b; p4b *= 4n; }
+
+    boardEl.classList.toggle('rotated', rotated);
+    updateCellSize();
+    updateBoardWrapPadding();
+    init();
+
+    const c = countKnights(START);
+    if ((c.w > 0 || c.b > 0) && c.w !== c.b) {
+      setStatus('warnUnbalanced', c.w, c.b);
+    }
+  }
+
+  function updateAuthorLine() {
+    const name = (lang === 'en') ? (currentNameEn || currentName) : currentName;
+    if (currentAuthor) {
+      authorLine.innerHTML =
+        escapeHTML(t('authorLabel')) + ' ' +
+        '<span class="author-name">' + escapeHTML(name) + '</span>' +
+        ' &nbsp;·&nbsp; ' + escapeHTML(t('authorOf')) + ' ' +
+        '<span class="author-name">' + escapeHTML(currentAuthor) + '</span>';
+    } else {
+      authorLine.innerHTML =
+        escapeHTML(t('authorLabel')) + ' ' +
+        '<span class="author-name">' + escapeHTML(name) + '</span>';
+    }
+  }
+
+  /* ============================================================
+     Список головоломок
+     ============================================================ */
+  function renderPuzzleSelect() {
+    const cur = parseInt(puzzleSel.value, 10);
+    puzzleSel.innerHTML = '';
+
+    const byAuthor = {};
+    const order = [];
+    for (let i = 0; i < PUZZLES.length; i++) {
+      const a = PUZZLES[i].author || DEFAULT_AUTHOR;
+      if (!byAuthor[a]) { byAuthor[a] = []; order.push(a); }
+      byAuthor[a].push(i);
+    }
+
+    for (let a = 0; a < order.length; a++) {
+      const author = order[a];
+      const indices = byAuthor[author];
+      const group = document.createElement('optgroup');
+      group.label = author;
+      for (let k = 0; k < indices.length; k++) {
+        const idx = indices[k];
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = getLocalName(PUZZLES[idx]);
+        group.appendChild(opt);
+      }
+      puzzleSel.appendChild(group);
+    }
+
+    if (!isNaN(cur) && cur >= 0 && cur < PUZZLES.length) {
+      puzzleSel.value = String(cur);
+    } else {
+      puzzleSel.value = '0';
+    }
+    updateNavButtons();
+  }
+
+  function updateNavButtons() {
+    if (editorMode) {
+      prevPuzzleBtn.disabled = true;
+      nextPuzzleBtn.disabled = true;
+    } else {
+      prevPuzzleBtn.disabled = false;
+      nextPuzzleBtn.disabled = false;
+    }
+  }
+
+  function loadPuzzle(idx) {
+    currentPuzzleIdx = idx;
+    loadPuzzleData(PUZZLES[idx], idx);
+  }
+
+  function stopAllActivity() {
+    searchGeneration++;
+    if (playbackTimer) { clearTimeout(playbackTimer); playbackTimer = null; }
+    if (mode === 'searching' || mode === 'playing' || animating) {
+      mode = 'idle';
+      animating = false;
+      flyer.classList.remove('animating');
+      flyer.style.opacity = '0';
+    }
+    updateButtons();
+  }
+
+  function changePuzzle(idx) {
+    if (idx < 0 || idx >= PUZZLES.length) return;
+    if (editorMode) return;
+    stopAllActivity();
+    puzzleSel.value = String(idx);
+    loadPuzzle(idx);
+  }
+
+  function switchPuzzle(delta) {
+    if (editorMode) return;
+    const cur = currentPuzzleIdx;
+    const next = (cur + delta + PUZZLES.length) % PUZZLES.length;
+    changePuzzle(next);
+  }
+
+  /* ============================================================
+     Инициализация
+     ============================================================ */
+  function init() {
+    board    = START.map(row => row.slice());
+    selected = null;
+    targets  = [];
+    moves    = 0;
+    solved   = false;
+
+    timeline = [{ board: START.map(row => row.slice()), moves: 0, solved: false, move: null }];
+    cursor = 0;
+
+    mode = 'idle';
+    animating = false;
+    searchGeneration++;
+    playbackId++;
+    if (playbackTimer) { clearTimeout(playbackTimer); playbackTimer = null; }
+    flyer.classList.remove('animating');
+    flyer.style.opacity = '0';
+
+    setStatus('moves');
+    render();
+    updateMovesText();
+  }
+
+  /* ============================================================
+     Размеры
+     ============================================================ */
+  function computeCellSize() {
+    const maxDim = editorMode ? Math.max(editor.rows, editor.cols) : Math.max(ROWS, COLS);
+    const isRot  = editorMode ? editor.rotated : rotated;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const target = isRot
+      ? Math.min(vw * 0.52, vh * 0.55, 310)
+      : Math.min(vw * 0.82, vh * 0.68, 440);
+    const gap = 8;
+    const boardPadding = gap + 4;
+    const available = target - 2 * boardPadding - (maxDim - 1) * gap;
+    let cell = Math.floor(available / maxDim);
+    cell = Math.max(22, Math.min(58, cell));
+    return cell;
+  }
+
+  function updateCellSize() {
+    const cell = computeCellSize();
+    boardEl.style.setProperty('--cell', cell + 'px');
+  }
+
+  function updateBoardWrapPadding() {
+    const isRot = editorMode ? editor.rotated : rotated;
+    const cellSize = computeCellSize();
+    const gap = 8;
+    const boardPadding = gap + 4;
+    const curRows = editorMode ? editor.rows : ROWS;
+    const curCols = editorMode ? editor.cols : COLS;
+    const showCoords = !editorMode;
+    const extraW = showCoords ? (LABEL_SIZE + gap) : 0;
+    const extraH = showCoords ? (LABEL_SIZE + gap) : 0;
+    const gridH = cellSize * curRows + (curRows - 1) * gap + extraH;
+    const gridW = cellSize * curCols + (curCols - 1) * gap + extraW;
+    const boardH = gridH + 2 * boardPadding;
+    const boardW = gridW + 2 * boardPadding;
+    if (!isRot) {
+      boardWrap.style.padding = '15px';
+    } else {
+      const size = Math.max(boardH, boardW);
+      const pad = Math.ceil(size * 0.22) + 8;
+      boardWrap.style.padding = pad + 'px';
+    }
+    boardWrap.style.minHeight = '';
+  }
+
+  function getCellRect(r, c) {
+    const gap = 8;
+    const pad = gap + 4;
+    const cellSize = parseFloat(getComputedStyle(boardEl).getPropertyValue('--cell'));
+    const showCoords = !editorMode;
+    const offsetX = showCoords ? (LABEL_SIZE + gap) : 0;
+    return {
+      left: pad + offsetX + c * (cellSize + gap),
+      top:  pad + r * (cellSize + gap),
+      size: cellSize
+    };
+  }
+
+  /* ============================================================
+     Отрисовка игрового поля
+     ============================================================ */
+  function render() {
+    boardEl.innerHTML = '';
+    boardEl.appendChild(flyer);
+
+    const showCoords = !editorMode;
+    if (showCoords) {
+      boardEl.style.gridTemplateColumns = LABEL_SIZE + 'px repeat(' + COLS + ', var(--cell))';
+    } else {
+      boardEl.style.gridTemplateColumns = 'repeat(' + COLS + ', var(--cell))';
+    }
+
+    const targetKeys = new Set();
+    for (let i = 0; i < targets.length; i++) {
+      targetKeys.add(targets[i][0] + ',' + targets[i][1]);
+    }
+
+    for (let r = 0; r < ROWS; r++) {
+      if (showCoords) {
+        const lbl = document.createElement('div');
+        lbl.className = 'coord-label';
+        const inner = document.createElement('span');
+        inner.className = 'label-text';
+        inner.textContent = String(ROWS - r);
+        lbl.appendChild(inner);
+        boardEl.appendChild(lbl);
+      }
+
+      for (let c = 0; c < COLS; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+
+        if (START[r][c] === 'x') {
+          cell.classList.add('off');
+          boardEl.appendChild(cell);
+          continue;
+        }
+
+        const v = board[r][c];
+        if (v === '_') {
+          cell.classList.add('empty');
+          if (targetKeys.has(r + ',' + c)) cell.classList.add('target');
+        } else {
+          const cls = v === 'w' ? 'white' : v === 'b' ? 'black' : 'red';
+          cell.classList.add('knight', cls);
+          const span = document.createElement('span');
+          span.className = 'glyph';
+          span.textContent = '♞';
+          cell.appendChild(span);
+          if (selected && selected[0] === r && selected[1] === c) {
+            cell.classList.add('selected');
+          } else if (getTargets(r, c).length === 0) {
+            cell.classList.add('nomove');
+          }
+        }
+
+        cell.addEventListener('click', (function (rr, cc) {
+          return function () { onCellClick(rr, cc); };
+        })(r, c));
+        boardEl.appendChild(cell);
+      }
+    }
+
+    if (showCoords) {
+      const corner = document.createElement('div');
+      corner.className = 'coord-label';
+      boardEl.appendChild(corner);
+      for (let c = 0; c < COLS; c++) {
+        const lbl = document.createElement('div');
+        lbl.className = 'coord-label';
+        const inner = document.createElement('span');
+        inner.className = 'label-text';
+        inner.textContent = LETTERS[c];
+        lbl.appendChild(inner);
+        boardEl.appendChild(lbl);
+      }
+    }
+    updateButtons();
+  }
+
+  /* ============================================================
+     Анимация
+     ============================================================ */
+  function setFlyerColor(color) {
+    if (color === 'w') {
+      flyer.style.color = '#ffffff';
+      flyer.style.webkitTextStroke = '1.5px #12182a';
+      flyer.style.textShadow = '0 0 2px #0b0f18';
+    } else if (color === 'b') {
+      flyer.style.color = '#10141f';
+      flyer.style.webkitTextStroke = '1.5px #8ea0c8';
+      flyer.style.textShadow = '0 0 2px #6f7fa8';
+    } else {
+      flyer.style.color = '#e85a5a';
+      flyer.style.webkitTextStroke = '1.5px #4a1010';
+      flyer.style.textShadow = '0 0 2px #3a0808';
+    }
+    if (theme === 'light') {
+      if (color === 'w') {
+        flyer.style.webkitTextStroke = '1.5px #1a2030';
+        flyer.style.textShadow = 'none';
+      } else if (color === 'b') {
+        flyer.style.webkitTextStroke = '1px #c8d0e0';
+        flyer.style.textShadow = 'none';
+      } else {
+        flyer.style.webkitTextStroke = '1.5px #601010';
+        flyer.style.textShadow = 'none';
+      }
+    }
+  }
+
+  function setFlyerGlyphMirror(color) {
+    const glyph = flyer.querySelector('.glyph');
+    if (!glyph) return;
+    if (color === 'w') {
+      glyph.style.transform = rotated ? 'rotate(-45deg) scaleX(-1)' : 'scaleX(-1)';
+    } else {
+      glyph.style.transform = rotated ? 'rotate(-45deg)' : '';
+    }
+  }
+
+  function animateMove(fr, fc, tr, tc, color, callback) {
+    animating = true;
+    updateButtons();
+    const fromRect = getCellRect(fr, fc);
+    const toRect   = getCellRect(tr, tc);
+
+    flyer.classList.remove('animating');
+    const cls = color === 'w' ? 'white' : color === 'b' ? 'black' : 'red';
+    flyer.className = 'knight ' + cls;
+    setFlyerColor(color);
+
+    flyer.style.width    = fromRect.size + 'px';
+    flyer.style.height   = fromRect.size + 'px';
+    flyer.style.fontSize = (fromRect.size * 0.92) + 'px';
+    flyer.style.background = (theme === 'light') ? '#e8ecf5' : '#556590';
+    flyer.style.boxShadow  = (theme === 'light')
+      ? 'inset 0 0 0 2px #c8d0e0'
+      : 'inset 0 0 0 2px #6b7ba5';
+    flyer.style.opacity    = '1';
+    flyer.innerHTML        = '<span class="glyph">♞</span>';
+    setFlyerGlyphMirror(color);
+    flyer.style.transform  = 'translate(' + fromRect.left + 'px,' + fromRect.top + 'px)';
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        flyer.classList.add('animating');
+        flyer.style.transform = 'translate(' + toRect.left + 'px,' + toRect.top + 'px)';
+      });
+    });
+
+    setTimeout(function () {
+      flyer.style.opacity = '0';
+      flyer.classList.remove('animating');
+      animating = false;
+      callback();
+    }, ANIM_MS);
+  }
+
+  /* ============================================================
+     Ход
+     ============================================================ */
+  function isSolvedOn(bd) {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (START[r][c] === 'x') continue;
+        if (bd[r][c] !== GOAL[r][c]) return false;
+      }
+    }
+    return true;
+  }
+
+  function commitMove(fr, fc, tr, tc, color, animate) {
+    const prev = timeline[cursor];
+    const nb = prev.board.map(row => row.slice());
+    nb[fr][fc] = '_';
+    nb[tr][tc] = color;
+    const newMoves  = prev.moves + 1;
+    const newSolved = isSolvedOn(nb);
+
+    timeline.length = cursor + 1;
+    timeline.push({
+      board: nb, moves: newMoves, solved: newSolved,
+      move: { from: [fr, fc], to: [tr, tc], color: color }
+    });
+    cursor++;
+    updateMovesText();
+
+    if (!animate) {
+      board = nb; moves = newMoves; solved = newSolved;
+      if (solved) setStatus('win'); else setStatus('moves');
+      render();
+      return;
+    }
+
+    const animBoard = nb.map(row => row.slice());
+    animBoard[tr][tc] = '_';
+    board = animBoard;
+    render();
+
+    animateMove(fr, fc, tr, tc, color, function () {
+      board = nb; moves = newMoves; solved = newSolved;
+      if (solved) setStatus('win'); else setStatus('moves');
+      render();
+    });
+  }
+
+  function onCellClick(r, c) {
+    if (solved || animating) return;
+    if (mode !== 'idle') return;
+    const v = board[r][c];
+
+    if (isKnight(v)) {
+      if (selected && selected[0] === r && selected[1] === c) {
+        selected = null; targets = []; render(); return;
+      }
+      const t = getTargets(r, c);
+      if (t.length === 0) return;
+      selected = [r, c]; targets = t; render();
+      return;
+    }
+
+    if (v === '_' && selected) {
+      let ok = false;
+      for (let i = 0; i < targets.length; i++) {
+        if (targets[i][0] === r && targets[i][1] === c) { ok = true; break; }
+      }
+      if (!ok) return;
+      const sr = selected[0], sc = selected[1];
+      const color = board[sr][sc];
+      selected = null;
+      targets  = [];
+      commitMove(sr, sc, r, c, color, true);
+    }
+  }
+
+  /* ============================================================
+     Кнопки
+     ============================================================ */
+  function updateButtons() {
+    const idle = (mode === 'idle' && !animating);
+    undoBtn.disabled  = !idle || cursor === 0;
+    redoBtn.disabled  = !idle || cursor >= timeline.length - 1;
+    resetBtn.disabled = !idle;
+    editBtn.disabled  = !idle;
+    updateSolveButton();
+  }
+
+  function updateSolveButton() {
+    const searching = (mode === 'searching');
+    const playing   = (mode === 'playing');
+    if (searching || playing) {
+      solveBtn.disabled = false;
+      solveBtn.textContent = t('btnStop');
+      solveBtn.classList.add('stop');
+    } else if (animating || solved) {
+      solveBtn.disabled = true;
+      solveBtn.textContent = t('btnSolve');
+      solveBtn.classList.remove('stop');
+    } else {
+      solveBtn.disabled = false;
+      solveBtn.textContent = t('btnSolve');
+      solveBtn.classList.remove('stop');
+    }
+  }
+
+  function updateRotateButton() {
+    rotBtn.textContent = editor.rotated ? t('btnRotateBack') : t('btnRotate');
+  }
+
+  /* ============================================================
+     Ундо / Редо
+     ============================================================ */
+  function undo() {
+    if (animating || mode !== 'idle' || cursor === 0) return;
+    const m = timeline[cursor].move;
+    if (!m) return;
+
+    const targetState = timeline[cursor - 1];
+    const animBoard = targetState.board.map(row => row.slice());
+    animBoard[m.from[0]][m.from[1]] = '_';
+    board = animBoard;
+    selected = null;
+    targets  = [];
+    render();
+
+    animateMove(m.to[0], m.to[1], m.from[0], m.from[1], m.color, function () {
+      cursor--;
+      board = timeline[cursor].board;
+      moves = timeline[cursor].moves;
+      solved = timeline[cursor].solved;
+      if (solved) setStatus('win'); else setStatus('moves');
+      render();
+      updateMovesText();
+    });
+  }
+
+  function redo() {
+    if (animating || mode !== 'idle') return;
+    if (cursor >= timeline.length - 1) return;
+    const nextState = timeline[cursor + 1];
+    const m = nextState.move;
+    if (!m) return;
+
+    const animBoard = timeline[cursor].board.map(row => row.slice());
+    animBoard[m.from[0]][m.from[1]] = '_';
+    board = animBoard;
+    selected = null;
+    targets  = [];
+    render();
+
+    animateMove(m.from[0], m.from[1], m.to[0], m.to[1], m.color, function () {
+      cursor++;
+      board = timeline[cursor].board;
+      moves = timeline[cursor].moves;
+      solved = timeline[cursor].solved;
+      if (solved) setStatus('win'); else setStatus('moves');
+      render();
+      updateMovesText();
+    });
+  }
+
+  /* ============================================================
+     Решатели
+     ============================================================ */
+  function encodeBoard(bd) {
+    let s = '';
+    for (let i = 0; i < N; i++) {
+      const r = cells[i][0], c = cells[i][1];
+      const v = bd[r][c];
+      const code = v === 'w' ? 1 : v === 'b' ? 2 : v === 'r' ? 3 : 0;
+      s += String.fromCharCode(48 + code);
+    }
+    return s;
+  }
+
+  async function findSolutionNum(myGen, onProgress) {
+    let startKey = 0, goalKey = 0;
+    for (let i = 0; i < N; i++) {
+      const r = cells[i][0], c = cells[i][1];
+      const v = board[r][c];
+      if (v !== '_') startKey += (v === 'w' ? 1 : v === 'b' ? 2 : 3) * POW4[i];
+      const g = GOAL[r][c];
+      if (g !== '_') goalKey  += (g === 'w' ? 1 : g === 'b' ? 2 : 3) * POW4[i];
+    }
+    if (startKey === goalKey) return [];
+
+    const mapA = new Map(), mapB = new Map();
+    const prevIdxA = [-1], fromA = [0], toA = [0];
+    const prevIdxB = [-1], fromB = [0], toB = [0];
+    mapA.set(startKey, 0);
+    mapB.set(goalKey, 0);
+
+    let frontierA = [startKey], frontierB = [goalKey];
+    let depthA = 0, depthB = 0;
+    const state = new Uint8Array(N);
+
+    for (let iter = 0; iter < MAX_ITER; iter++) {
+      if (searchGeneration !== myGen) return null;
+      if (frontierA.length === 0 && frontierB.length === 0) throw new Error('__UNSOLVABLE__');
+      if (mapA.size + mapB.size > MAX_STATES) throw new Error('__OOM__');
+
+      let expandA;
+      if (frontierA.length === 0) expandA = false;
+      else if (frontierB.length === 0) expandA = true;
+      else expandA = frontierA.length <= frontierB.length;
+
+      const frontier = expandA ? frontierA : frontierB;
+      const map      = expandA ? mapA      : mapB;
+      const other    = expandA ? mapB      : mapA;
+      const prevArr  = expandA ? prevIdxA  : prevIdxB;
+      const fromArr  = expandA ? fromA     : fromB;
+      const toArr    = expandA ? toA       : toB;
+
+      if (expandA) depthA++; else depthB++;
+      const nextFrontier = [];
+      let meetKey = -1;
+
+      for (let fi = 0; fi < frontier.length && meetKey < 0; fi++) {
+        if ((fi & 1023) === 0 && searchGeneration !== myGen) return null;
+        const key = frontier[fi];
+        const keyIdx = map.get(key);
+        let kk = key;
+        for (let i = 0; i < N; i++) { state[i] = kk % 4; kk = (kk - state[i]) / 4; }
+        for (let e = 0; e < N && meetKey < 0; e++) {
+          if (state[e] !== 0) continue;
+          const nbrs = neighbors[e];
+          for (let j = 0; j < nbrs.length; j++) {
+            const nb = nbrs[j];
+            const v  = state[nb];
+            if (v === 0) continue;
+            const nk = key + v * POW4[e] - v * POW4[nb];
+            if (map.has(nk)) continue;
+            const newIdx = prevArr.length;
+            map.set(nk, newIdx);
+            prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
+            if (other.has(nk)) { meetKey = nk; break; }
+            nextFrontier.push(nk);
+          }
+        }
+      }
+
+      if (meetKey >= 0) {
+        if (onProgress) onProgress(depthA, depthB, true);
+        const pathA = [];
+        let idx = mapA.get(meetKey);
+        while (prevIdxA[idx] !== -1) {
+          pathA.push([fromA[idx], toA[idx]]);
+          idx = prevIdxA[idx];
+        }
+        pathA.reverse();
+        const pathB = [];
+        idx = mapB.get(meetKey);
+        while (prevIdxB[idx] !== -1) {
+          pathB.push([toB[idx], fromB[idx]]);
+          idx = prevIdxB[idx];
+        }
+        return pathA.concat(pathB);
+      }
+      if (expandA) { frontierA = nextFrontier; } else { frontierB = nextFrontier; }
+      if (onProgress) onProgress(depthA, depthB, false);
+      await new Promise(r => setTimeout(r, 0));
+    }
+    return null;
+  }
+
+  async function findSolution(myGen, onProgress) {
+    if (N <= NUM_LIMIT) return await findSolutionNum(myGen, onProgress);
+    const useStrings = (N > BIG_LIMIT);
+    let startKey, goalKey;
+    if (useStrings) {
+      startKey = encodeBoard(board);
+      goalKey  = encodeBoard(GOAL);
+    } else {
+      let sk = 0n, gk = 0n;
+      for (let i = 0; i < N; i++) {
+        const r = cells[i][0], c = cells[i][1];
+        const v = board[r][c];
+        if (v !== '_') {
+          const vv = v === 'w' ? 1n : v === 'b' ? 2n : 3n;
+          sk += vv * POW4_BIG[i];
+        }
+        const g = GOAL[r][c];
+        if (g !== '_') {
+          const gv = g === 'w' ? 1n : g === 'b' ? 2n : 3n;
+          gk += gv * POW4_BIG[i];
+        }
+      }
+      startKey = sk; goalKey = gk;
+    }
+    if (startKey === goalKey) return [];
+
+    const mapA = new Map(), mapB = new Map();
+    const prevIdxA = [-1], fromA = [0], toA = [0];
+    const prevIdxB = [-1], fromB = [0], toB = [0];
+    mapA.set(startKey, 0);
+    mapB.set(goalKey, 0);
+
+    let frontierA = [startKey], frontierB = [goalKey];
+    let depthA = 0, depthB = 0;
+    const state = useStrings ? null : new Uint8Array(N);
+
+    for (let iter = 0; iter < MAX_ITER; iter++) {
+      if (searchGeneration !== myGen) return null;
+      if (frontierA.length === 0 && frontierB.length === 0) throw new Error('__UNSOLVABLE__');
+      if (mapA.size + mapB.size > MAX_STATES) throw new Error('__OOM__');
+
+      let expandA;
+      if (frontierA.length === 0) expandA = false;
+      else if (frontierB.length === 0) expandA = true;
+      else expandA = frontierA.length <= frontierB.length;
+
+      const frontier = expandA ? frontierA : frontierB;
+      const map      = expandA ? mapA      : mapB;
+      const other    = expandA ? mapB      : mapA;
+      const prevArr  = expandA ? prevIdxA  : prevIdxB;
+      const fromArr  = expandA ? fromA     : fromB;
+      const toArr    = expandA ? toA       : toB;
+
+      if (expandA) depthA++; else depthB++;
+      const nextFrontier = [];
+      let meetKey = null;
+
+      for (let fi = 0; fi < frontier.length && meetKey === null; fi++) {
+        if ((fi & 1023) === 0 && searchGeneration !== myGen) return null;
+        const key = frontier[fi];
+        const keyIdx = map.get(key);
+
+        if (useStrings) {
+          for (let e = 0; e < N && meetKey === null; e++) {
+            if (key.charCodeAt(e) !== 48) continue;
+            const nbrs = neighbors[e];
+            for (let j = 0; j < nbrs.length; j++) {
+              const nb = nbrs[j];
+              if (key.charCodeAt(nb) === 48) continue;
+              let nk;
+              if (e < nb) {
+                nk = key.substring(0, e) + key[nb] + key.substring(e + 1, nb) + '0' + key.substring(nb + 1);
+              } else {
+                nk = key.substring(0, nb) + '0' + key.substring(nb + 1, e) + key[nb] + key.substring(e + 1);
+              }
+              if (map.has(nk)) continue;
+              const newIdx = prevArr.length;
+              map.set(nk, newIdx);
+              prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
+              if (other.has(nk)) { meetKey = nk; break; }
+              nextFrontier.push(nk);
+            }
+          }
+        } else {
+          let k = key;
+          for (let i = 0; i < N; i++) { state[i] = Number(k & 3n); k >>= 2n; }
+          for (let e = 0; e < N && meetKey === null; e++) {
+            if (state[e] !== 0) continue;
+            const nbrs = neighbors[e];
+            for (let j = 0; j < nbrs.length; j++) {
+              const nb = nbrs[j];
+              const v  = state[nb];
+              if (v === 0) continue;
+              const vb = BigInt(v);
+              const nk = key + vb * POW4_BIG[e] - vb * POW4_BIG[nb];
+              if (map.has(nk)) continue;
+              const newIdx = prevArr.length;
+              map.set(nk, newIdx);
+              prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
+              if (other.has(nk)) { meetKey = nk; break; }
+              nextFrontier.push(nk);
+            }
+          }
+        }
+      }
+
+      if (meetKey !== null) {
+        if (onProgress) onProgress(depthA, depthB, true);
+        const pathA = [];
+        let idx = mapA.get(meetKey);
+        while (prevIdxA[idx] !== -1) {
+          pathA.push([fromA[idx], toA[idx]]);
+          idx = prevIdxA[idx];
+        }
+        pathA.reverse();
+        const pathB = [];
+        idx = mapB.get(meetKey);
+        while (prevIdxB[idx] !== -1) {
+          pathB.push([toB[idx], fromB[idx]]);
+          idx = prevIdxB[idx];
+        }
+        return pathA.concat(pathB);
+      }
+      if (expandA) { frontierA = nextFrontier; } else { frontierB = nextFrontier; }
+      if (onProgress) onProgress(depthA, depthB, false);
+      await new Promise(r => setTimeout(r, 0));
+    }
+    return null;
+  }
+
+  function verifyPath(path, startBoard, goalBoard) {
+    const bd = startBoard.map(row => row.slice());
+    for (let i = 0; i < path.length; i++) {
+      const from = path[i][0];
+      const to   = path[i][1];
+      const fr = cells[from][0], fc = cells[from][1];
+      const tr = cells[to][0],   tc = cells[to][1];
+      if (bd[fr][fc] === '_') return false;
+      if (bd[tr][tc] !== '_') return false;
+      bd[tr][tc] = bd[fr][fc];
+      bd[fr][fc] = '_';
+    }
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (START[r][c] === 'x') continue;
+        if (bd[r][c] !== goalBoard[r][c]) return false;
+      }
+    }
+    return true;
+  }
+
+  /* ============================================================
+     Автопроигрывание
+     ============================================================ */
+  function playPath(path) {
+    const myId = ++playbackId;
+    let i = 0;
+    mode = 'playing';
+    updateButtons();
+
+    function finish() {
+      if (playbackId !== myId) return;
+      mode = 'idle';
+      playbackTimer = null;
+      updateButtons();
+      if (solved) setStatus('win'); else setStatus('moves');
+    }
+
+    function step() {
+      if (playbackId !== myId) return;
+      if (i >= path.length || solved) { finish(); return; }
+      const from = path[i][0];
+      const to   = path[i][1];
+      i++;
+      const fr = cells[from][0], fc = cells[from][1];
+      const tr = cells[to][0],   tc = cells[to][1];
+      const color = board[fr][fc];
+      if (!isKnight(color)) { finish(); return; }
+      commitMove(fr, fc, tr, tc, color, false);
+      if (solved) { finish(); return; }
+      setStatus('playingPath', i, path.length);
+      playbackTimer = setTimeout(step, STEP_MS);
+    }
+    step();
+  }
+
+  function stopPlayback() {
+    if (mode !== 'playing') return;
+    playbackId++;
+    if (playbackTimer) { clearTimeout(playbackTimer); playbackTimer = null; }
+    animating = false;
+    flyer.style.opacity = '0';
+    flyer.classList.remove('animating');
+    mode = 'idle';
+    updateButtons();
+    if (solved) setStatus('win'); else setStatus('moves');
+  }
+
+  /* ============================================================
+     РЕДАКТОР
+     ============================================================ */
+  function enterEditor() {
+    if (animating || mode !== 'idle') return;
+    editorSourceIdx = currentPuzzleIdx;
+    editor.rows    = ROWS;
+    editor.cols    = COLS;
+    editor.data    = START.map(row => row.slice());
+    editor.rotated = rotated;
+    editor.tool    = 'w';
+    editor.name    = currentName + ' (copy)';
+    editor.author  = currentAuthor || DEFAULT_AUTHOR;
+    editorMode = true;
+
+    pickerRow.style.display    = 'none';
+    sizePanel.style.display    = 'flex';
+    mainControls.style.display = 'none';
+    movesRow.style.display     = 'none';
+    editorPanel.style.display  = 'flex';
+    hintEl.innerHTML = t('hintEdit');
+    statusEl.textContent = '';
+    statusEl.classList.remove('win');
+    authorLine.innerHTML = '';
+
+    nameInput.value = editor.name;
+    authorInput.value = editor.author;
+    rowsInput.value = editor.rows;
+    colsInput.value = editor.cols;
+
+    updateNavButtons();
+    updateRotateButton();
+    updateToolButtons();
+    updateCellSize();
+    renderEditor();
+    updateBoardWrapPadding();
+  }
+
+  function exitEditor() {
+    editorMode = false;
+    painting = false;
+    pickerRow.style.display    = '';
+    sizePanel.style.display    = 'none';
+    mainControls.style.display = '';
+    movesRow.style.display     = '';
+    editorPanel.style.display  = 'none';
+    hintEl.innerHTML = t('hintPlay');
+    updateNavButtons();
+    loadPuzzleData({
+      name: currentName, nameEn: currentNameEn, author: currentAuthor,
+      data: START.map(row => row.slice()), rotated: rotated
+    }, editorSourceIdx);
+  }
+
+  function updateToolButtons() {
+    const btns = editorPanel.querySelectorAll('.tool-btn');
+    for (let i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].dataset.tool === editor.tool);
+    }
+  }
+
+  function renderEditor() {
+    boardEl.innerHTML = '';
+    boardEl.classList.toggle('rotated', editor.rotated);
+    boardEl.style.gridTemplateColumns = 'repeat(' + editor.cols + ', var(--cell))';
+
+    editorCells = [];
+    for (let r = 0; r < editor.rows; r++) {
+      editorCells[r] = [];
+      for (let c = 0; c < editor.cols; c++) {
+        const cell = document.createElement('div');
+        applyEditorCellVisual(cell, editor.data[r][c]);
+        (function (rr, cc, cellEl) {
+          cellEl.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            painting = true;
+            editor.data[rr][cc] = editor.tool;
+            applyEditorCellVisual(cellEl, editor.tool);
+          });
+          cellEl.addEventListener('mouseenter', function () {
+            if (painting) {
+              editor.data[rr][cc] = editor.tool;
+              applyEditorCellVisual(cellEl, editor.tool);
+            }
+          });
+        })(r, c, cell);
+        editorCells[r][c] = cell;
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function applyEditorCellVisual(cellEl, v) {
+    cellEl.className = 'cell editor-cell';
+    cellEl.innerHTML = '';
+    if (v === 'x') {
+      cellEl.classList.add('off');
+      cellEl.textContent = '×';
+    } else if (v === '_') {
+      cellEl.classList.add('empty');
+    } else {
+      const cls = v === 'w' ? 'white' : v === 'b' ? 'black' : 'red';
+      cellEl.classList.add('knight', cls);
+      const span = document.createElement('span');
+      span.className = 'glyph';
+      span.textContent = '♞';
+      cellEl.appendChild(span);
+    }
+  }
+
+  function resizeEditorData(newRows, newCols) {
+    const oldData = editor.data;
+    const newData = [];
+    for (let r = 0; r < newRows; r++) {
+      const row = [];
+      for (let c = 0; c < newCols; c++) {
+        if (oldData[r] && c < oldData[r].length) row.push(oldData[r][c]);
+        else row.push('x');
+      }
+      newData.push(row);
+    }
+    editor.data = newData;
+    editor.rows = newRows;
+    editor.cols = newCols;
+  }
+
+  function runEditedPuzzle() {
+    const c = countKnights(editor.data);
+    if (c.w === 0 && c.b === 0) { setStatus('errEmptyPuzzle'); return; }
+
+    editorMode = false;
+    painting = false;
+    const newName = (nameInput.value || '').trim() || t('defaultName');
+    const newAuthor = (authorInput.value || '').trim() || DEFAULT_AUTHOR;
+
+    pickerRow.style.display    = '';
+    sizePanel.style.display    = 'none';
+    mainControls.style.display = '';
+    movesRow.style.display     = '';
+    editorPanel.style.display  = 'none';
+    hintEl.innerHTML = t('hintPlay');
+    updateNavButtons();
+
+    const isSameAsSource =
+      (newName === PUZZLES[editorSourceIdx].name) &&
+      (newAuthor === (PUZZLES[editorSourceIdx].author || DEFAULT_AUTHOR));
+
+    if (isSameAsSource) {
+      PUZZLES[editorSourceIdx] = {
+        name: newName, nameEn: newName, author: newAuthor,
+        data: editor.data.map(row => row.slice()), rotated: editor.rotated
+      };
+      renderPuzzleSelect();
+      puzzleSel.value = String(editorSourceIdx);
+      loadPuzzle(editorSourceIdx);
+    } else {
+      PUZZLES.push({
+        name: newName, nameEn: newName, author: newAuthor,
+        data: editor.data.map(row => row.slice()), rotated: editor.rotated
+      });
+      const newIdx = PUZZLES.length - 1;
+      renderPuzzleSelect();
+      puzzleSel.value = String(newIdx);
+      changePuzzle(newIdx);
+    }
+  }
+
+  /* ============================================================
+     Копирование / вставка
+     ============================================================ */
+  function formatLevelJS() {
+    const name = (nameInput.value || '').trim() || t('defaultName');
+    const author = (authorInput.value || '').trim() || DEFAULT_AUTHOR;
+    const lines = [];
+    for (let r = 0; r < editor.rows; r++) {
+      const row = [];
+      for (let c = 0; c < editor.cols; c++) row.push("'" + editor.data[r][c] + "'");
+      lines.push('        [' + row.join(', ') + ']');
+    }
+    return "    {\n" +
+           "      name: '" + name.replace(/'/g, "\\'") + "',\n" +
+           "      author: '" + author.replace(/'/g, "\\'") + "',\n" +
+           "      data: [\n" + lines.join(',\n') + '\n' +
+           "      ],\n" +
+           "      rotated: " + (editor.rotated ? 'true' : 'false') + "\n" +
+           "    }";
+  }
+
+  function formatAllPuzzlesJS() {
+    const parts = [];
+    for (let i = 0; i < PUZZLES.length; i++) {
+      const p = PUZZLES[i];
+      const lines = [];
+      for (let r = 0; r < p.data.length; r++) {
+        const row = [];
+        for (let c = 0; c < p.data[r].length; c++) row.push("'" + p.data[r][c] + "'");
+        lines.push('        [' + row.join(', ') + ']');
+      }
+      let entry = "    {\n      name: '" + p.name.replace(/'/g, "\\'") + "',\n";
+      if (p.nameEn && p.nameEn !== p.name) {
+        entry += "      nameEn: '" + p.nameEn.replace(/'/g, "\\'") + "',\n";
+      }
+      entry += "      author: '" + (p.author || DEFAULT_AUTHOR).replace(/'/g, "\\'") + "',\n" +
+               "      data: [\n" + lines.join(',\n') + '\n' +
+               "      ],\n" +
+               "      rotated: " + (p.rotated ? 'true' : 'false') + "\n    }";
+      parts.push(entry);
+    }
+    return "const PUZZLES = [\n" + parts.join(',\n\n') + "\n];";
+  }
+
+  function parseLevelJS(text) {
+    if (!text) return null;
+    try {
+      const nameM    = text.match(/name\s*:\s*['"]([^'"]*)['"]/);
+      const authorM  = text.match(/author\s*:\s*['"]([^'"]*)['"]/);
+      const rotatedM = text.match(/rotated\s*:\s*(true|false)/);
+      const dataIdx = text.indexOf('data');
+      if (dataIdx < 0) return null;
+      const arrStart = text.indexOf('[', dataIdx);
+      if (arrStart < 0) return null;
+
+      let depth = 0, end = -1;
+      for (let i = arrStart; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '[') depth++;
+        else if (ch === ']') { depth--; if (depth === 0) { end = i; break; } }
+      }
+      if (end < 0) return null;
+      const dataStr = text.substring(arrStart, end + 1);
+
+      const rows = [];
+      let j = 1;
+      while (j < dataStr.length) {
+        while (j < dataStr.length && /[\s,]/.test(dataStr[j])) j++;
+        if (j >= dataStr.length || dataStr[j] === ']') break;
+        if (dataStr[j] !== '[') return null;
+        let inner = 0;
+        const rowStart = j;
+        for (; j < dataStr.length; j++) {
+          if (dataStr[j] === '[') inner++;
+          else if (dataStr[j] === ']') { inner--; if (inner === 0) { j++; break; } }
+        }
+        const rowStr = dataStr.substring(rowStart, j);
+        const rowCells = [];
+        const re = /['"]([x_wbr])['"]/g;
+        let m;
+        while ((m = re.exec(rowStr)) !== null) rowCells.push(m[1]);
+        if (rowCells.length === 0) return null;
+        rows.push(rowCells);
+      }
+      if (rows.length === 0) return null;
+      const cols = rows[0].length;
+      for (let k = 0; k < rows.length; k++) if (rows[k].length !== cols) return null;
+      if (rows.length > 10 || cols > 10) return null;
+
+      return {
+        name:    nameM ? nameM[1] : '',
+        author:  authorM ? authorM[1] : '',
+        data:    rows,
+        rotated: rotatedM ? rotatedM[1] === 'true' : false
+      };
+    } catch (e) { return null; }
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try {
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        ok ? resolve() : reject(new Error('execCommand failed'));
+      } catch (e) { document.body.removeChild(ta); reject(e); }
+    });
+  }
+
+  function readFromClipboard() {
+    if (navigator.clipboard && navigator.clipboard.readText) {
+      return navigator.clipboard.readText();
+    }
+    return Promise.reject(new Error('clipboard.readText unavailable'));
+  }
+
+  function flashButton(btn, okText, failText, ok) {
+    const original = btn.dataset.origText || btn.textContent;
+    btn.dataset.origText = original;
+    btn.textContent = ok ? okText : failText;
+    btn.disabled = true;
+    setTimeout(function () { btn.textContent = original; btn.disabled = false; }, 1200);
+  }
+
+  function flashIcon(btn, text) {
+    const original = btn.dataset.origText || btn.textContent;
+    btn.dataset.origText = original;
+    btn.textContent = text;
+    btn.disabled = true;
+    setTimeout(function () { btn.textContent = original; btn.disabled = false; }, 900);
+  }
+
+  /* ============================================================
+     Ходы
+     ============================================================ */
+  function parseMovesNotation(text) {
+    const moves = [];
+    if (!text) return moves;
+    const re = /([A-J])\s*(\d+)\s*[-\u2013\u2014]\s*([A-J])\s*(\d+)/gi;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const a = parseSquare(m[1] + m[2]);
+      const b = parseSquare(m[3] + m[4]);
+      if (a && b) moves.push([a, b]);
+    }
+    return moves;
+  }
+
+  function applyMovesNotation(moves) {
+    let applied = 0;
+    for (let k = 0; k < moves.length; k++) {
+      if (solved || animating) break;
+      if (mode !== 'idle') break;
+      const [from, to] = moves[k];
+      const [r1, c1] = from;
+      const [r2, c2] = to;
+      if (!isPlayable(r1, c1) || !isPlayable(r2, c2)) break;
+      const color = board[r1][c1];
+      if (!isKnight(color)) break;
+      if (board[r2][c2] !== '_') break;
+      if (!isKnightStep(r1, c1, r2, c2)) break;
+      commitMove(r1, c1, r2, c2, color, false);
+      applied++;
+      if (solved) break;
+    }
+    return applied;
+  }
+
+  /* ============================================================
+     Обработчики
+     ============================================================ */
+  resetBtn.addEventListener('click', function () {
+    if (animating || mode !== 'idle') return;
+    init();
+  });
+
+  undoBtn.addEventListener('click', undo);
+  redoBtn.addEventListener('click', redo);
+
+  solveBtn.addEventListener('click', async function () {
+    if (mode === 'searching') {
+      searchGeneration++;
+      mode = 'idle';
+      updateButtons();
+      setStatus('searchCancelled');
+      return;
+    }
+    if (mode === 'playing') { stopPlayback(); return; }
+    if (animating || solved) return;
+
+    const myGen = ++searchGeneration;
+    mode = 'searching';
+    updateButtons();
+    setStatus('searching');
+
+    await new Promise(r => setTimeout(r, 20));
+
+    const searchStart = performance.now();
+    const startBoardCopy = board.map(row => row.slice());
+    const goalBoardCopy  = GOAL.map(row => row.slice());
+    let path = null, oom = false, unsolvable = false;
+
+    try {
+      path = await findSolution(myGen, function (dA, dB, found) {
+        if (searchGeneration !== myGen) return;
+        if (found) return;
+        const total   = dA + dB;
+        const elapsed = (performance.now() - searchStart) / 1000;
+        setStatus('searchingDepth', total, elapsed.toFixed(1));
+      });
+    } catch (e) {
+      if (e && e.message === '__OOM__') oom = true;
+      else if (e && e.message === '__UNSOLVABLE__') unsolvable = true;
+      else throw e;
+    }
+
+    if (searchGeneration !== myGen) return;
+    if (oom) {
+      mode = 'idle';
+      setStatus('tooHard', MAX_STATES.toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US'));
+      updateButtons();
+      return;
+    }
+    if (unsolvable) {
+      mode = 'idle';
+      setStatus('unsolvable');
+      updateButtons();
+      return;
+    }
+    if (!path) {
+      mode = 'idle';
+      setStatus('searchAborted');
+      updateButtons();
+      return;
+    }
+    if (path.length === 0) {
+      solved = isSolvedOn(board);
+      mode = 'idle';
+      if (solved) setStatus('win'); else setStatus('moves');
+      updateButtons();
+      return;
+    }
+    if (!verifyPath(path, startBoardCopy, goalBoardCopy)) {
+      mode = 'idle';
+      setStatus('internalError');
+      updateButtons();
+      return;
+    }
+    setStatus('solutionFound', path.length);
+    playPath(path);
+  });
+
+  editBtn.addEventListener('click', enterEditor);
+  cancelBtn.addEventListener('click', exitEditor);
+  runBtn.addEventListener('click', runEditedPuzzle);
+
+  rotBtn.addEventListener('click', function () {
+    editor.rotated = !editor.rotated;
+    boardEl.classList.toggle('rotated', editor.rotated);
+    updateRotateButton();
+    updateCellSize();
+    renderEditor();
+    updateBoardWrapPadding();
+  });
+
+  copyBtn.addEventListener('click', function () {
+    const text = formatLevelJS();
+    copyToClipboard(text).then(function () {
+      flashButton(copyBtn, t('copyOk'), t('copyFail'), true);
+    }).catch(function () {
+      flashButton(copyBtn, t('copyOk'), t('copyFail'), false);
+    });
+  });
+
+  copyAllBtn.addEventListener('click', function () {
+    const text = formatAllPuzzlesJS();
+    copyToClipboard(text).then(function () {
+      flashButton(copyAllBtn, t('copyAllOk'), t('copyAllFail'), true);
+    }).catch(function () {
+      flashButton(copyAllBtn, t('copyAllOk'), t('copyAllFail'), false);
+    });
+  });
+
+  pasteBtn.addEventListener('click', function () {
+    readFromClipboard().then(function (text) {
+      const parsed = parseLevelJS(text);
+      if (!parsed) throw new Error('parse failed');
+      editor.name    = parsed.name || t('defaultName');
+      editor.author  = parsed.author || DEFAULT_AUTHOR;
+      editor.rows    = parsed.data.length;
+      editor.cols    = parsed.data[0].length;
+      editor.data    = parsed.data.map(function (row) { return row.slice(); });
+      editor.rotated = !!parsed.rotated;
+
+      nameInput.value = editor.name;
+      authorInput.value = editor.author;
+      rowsInput.value = editor.rows;
+      colsInput.value = editor.cols;
+      boardEl.classList.toggle('rotated', editor.rotated);
+      updateRotateButton();
+      updateCellSize();
+      renderEditor();
+      updateBoardWrapPadding();
+      flashButton(pasteBtn, t('pasteOk'), t('pasteFail'), true);
+    }).catch(function () {
+      flashButton(pasteBtn, t('pasteOk'), t('pasteFail'), false);
+    });
+  });
+
+  fillXBtn.addEventListener('click', function () {
+    for (let r = 0; r < editor.rows; r++) {
+      for (let c = 0; c < editor.cols; c++) editor.data[r][c] = 'x';
+    }
+    renderEditor();
+  });
+
+  fillEmptyBtn.addEventListener('click', function () {
+    for (let r = 0; r < editor.rows; r++) {
+      for (let c = 0; c < editor.cols; c++) editor.data[r][c] = '_';
+    }
+    renderEditor();
+  });
+
+  copyMovesBtn.addEventListener('click', function () {
+    if (!movesInput.value) { flashIcon(copyMovesBtn, '·'); return; }
+    copyToClipboard(movesInput.value).then(function () {
+      flashIcon(copyMovesBtn, '✓');
+    }).catch(function () {
+      flashIcon(copyMovesBtn, '⚠');
+    });
+  });
+
+  pasteMovesBtn.addEventListener('click', function () {
+    if (editorMode) return;
+    if (mode !== 'idle') return;
+    if (animating || solved) return;
+    readFromClipboard().then(function (text) {
+      const parsed = parseMovesNotation(text);
+      if (parsed.length === 0) { flashIcon(pasteMovesBtn, '⚠'); return; }
+      const applied = applyMovesNotation(parsed);
+      if (applied > 0) flashIcon(pasteMovesBtn, '✓');
+      else flashIcon(pasteMovesBtn, '⚠');
+    }).catch(function () {
+      flashIcon(pasteMovesBtn, '⚠');
+    });
+  });
+
+  galleryOpenBtn.addEventListener('click', openGallery);
+  galleryBack.addEventListener('click', closeGallery);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && galleryMode) closeGallery();
+  });
+
+  editorPanel.querySelectorAll('.tool-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      editor.tool = btn.dataset.tool;
+      updateToolButtons();
+    });
+  });
+
+  function commitSize() {
+    let rr = parseInt(rowsInput.value, 10);
+    let cc = parseInt(colsInput.value, 10);
+    if (isNaN(rr)) rr = editor.rows;
+    if (isNaN(cc)) cc = editor.cols;
+    rr = Math.max(1, Math.min(10, rr));
+    cc = Math.max(1, Math.min(10, cc));
+    rowsInput.value = rr;
+    colsInput.value = cc;
+    if (rr !== editor.rows || cc !== editor.cols) {
+      resizeEditorData(rr, cc);
+      updateCellSize();
+      renderEditor();
+      updateBoardWrapPadding();
+    }
+  }
+
+  rowsInput.addEventListener('input', commitSize);
+  colsInput.addEventListener('input', commitSize);
+  rowsInput.addEventListener('change', commitSize);
+  colsInput.addEventListener('change', commitSize);
+  rowsInput.addEventListener('blur',   commitSize);
+  colsInput.addEventListener('blur',   commitSize);
+
+  function endPainting() { painting = false; }
+  document.addEventListener('mouseup', endPainting);
+  document.addEventListener('mouseleave', endPainting);
+  window.addEventListener('mouseup', endPainting);
+  window.addEventListener('blur', endPainting);
+  document.addEventListener('touchend', endPainting);
+  document.addEventListener('touchcancel', endPainting);
+  document.addEventListener('mousemove', function (e) {
+    if (painting && (e.buttons & 1) === 0) painting = false;
+  });
+
+  boardWrap.addEventListener('wheel', function (e) {
+    if (editorMode) return;
+    if (animating || mode !== 'idle') return;
+    if (e.deltaY < 0 && cursor < timeline.length - 1) {
+      e.preventDefault(); redo();
+    } else if (e.deltaY > 0 && cursor > 0) {
+      e.preventDefault(); undo();
+    }
+  }, { passive: false });
+
+  puzzleSel.addEventListener('change', function () {
+    if (editorMode) return;
+    const idx = parseInt(puzzleSel.value, 10);
+    if (isNaN(idx)) return;
+    changePuzzle(idx);
+  });
+
+  prevPuzzleBtn.addEventListener('click', function () { switchPuzzle(-1); });
+  nextPuzzleBtn.addEventListener('click', function () { switchPuzzle(1); });
+
+  langBtn.addEventListener('click', function () {
+    lang = (lang === 'ru') ? 'en' : 'ru';
+    savePrefs();
+    applyLanguage();
+  });
+
+  themeBtn.addEventListener('click', function () {
+    theme = (theme === 'dark') ? 'light' : 'dark';
+    savePrefs();
+    applyTheme();
+  });
+
+  window.addEventListener('resize', function () {
+    updateCellSize();
+    updateBoardWrapPadding();
+  });
+
+  /* ============================================================
+     Старт
+     ============================================================ */
+  loadPrefs();
+  applyTheme();
+  renderPuzzleSelect();
+  applyLanguage();
+  loadPuzzle(0);
+})();
+</script>
+</body>
+</html>
