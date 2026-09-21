@@ -57,11 +57,24 @@
   .picker {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     font-size: 15px;
     color: #c0cadd;
     flex-wrap: wrap;
-    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+  }
+  .picker-row-1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    max-width: 100%;
+  }
+  .picker-row-2 {
+    display: flex;
+    align-items: center;
   }
 
   .nav-btn {
@@ -76,6 +89,7 @@
     transition: background .15s, transform .1s;
     box-shadow: inset 0 0 0 1px #7b88a9;
     line-height: 1;
+    flex-shrink: 0;
   }
   .nav-btn:hover:not(:disabled) { background: #7b88a9; }
   .nav-btn:active:not(:disabled) { transform: scale(.94); }
@@ -117,7 +131,10 @@
     font-family: inherit;
     cursor: pointer;
     outline: none;
-    min-width: 240px;
+    width: 240px;
+    min-width: 0;
+    max-width: 240px;
+    text-overflow: ellipsis;
   }
   select:focus { border-color: #2f6df6; }
   select optgroup {
@@ -172,10 +189,39 @@
     margin: -4px 0 -2px;
     letter-spacing: .3px;
     font-weight: 500;
+    max-width: 100%;
+    padding: 0 8px;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
   .author-line .author-name {
     color: #ffffff;
     font-weight: 600;
+  }
+
+  .max-step-line {
+    font-size: 15px;
+    color: #7ec8ff;
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: .3px;
+    padding: 0 8px;
+    max-width: 100%;
+    line-height: 1.4;
+    margin: -4px 0 -2px;
+    text-shadow: 0 0 8px rgba(126, 200, 255, .45);
+    transition: color .3s;
+  }
+  body.light .max-step-line {
+    color: #1a6db8;
+    text-shadow: none;
+  }
+  @media (max-width: 560px) {
+    .max-step-line { font-size: 13px; padding: 0 6px; }
+  }
+  @media (max-width: 400px) {
+    .max-step-line { font-size: 12px; }
   }
 
   .hint {
@@ -185,6 +231,7 @@
     font-size: 14px;
     line-height: 1.6;
     color: #c0cadd;
+    padding: 0 8px;
   }
 
   #boardWrap {
@@ -195,6 +242,31 @@
     padding: 15px;
     margin: 6px 0;
   }
+
+  .editor-counts {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+    color: #cdd6ea;
+    padding: 6px 14px;
+    background: #3f4a64;
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1);
+    flex-wrap: wrap;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+  .editor-counts .cnt-white { color: #ffffff; font-weight: 700; }
+  .editor-counts .cnt-black { color: #a8c2ff; font-weight: 700; }
+  .editor-counts .cnt-red   { color: #ff7a7a; font-weight: 700; }
+  body.light .editor-counts {
+    background: #ffffff;
+    color: #2f3a52;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08);
+  }
+  body.light .editor-counts .cnt-black { color: #2f6df6; }
+  body.light .editor-counts .cnt-red   { color: #d04040; }
 
   #board {
     --cell: 56px;
@@ -384,6 +456,7 @@
     text-align: center;
     max-width: 640px;
     line-height: 1.5;
+    padding: 0 8px;
   }
   #status.win {
     color: #e8ecf5;
@@ -414,6 +487,7 @@
     align-items: center;
     width: 100%;
     max-width: 520px;
+    padding: 0 4px;
   }
   .moves-input {
     flex: 1;
@@ -496,6 +570,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, .35),
                 inset 0 0 0 1px rgba(255, 255, 255, .1);
     max-width: 680px;
+    width: 100%;
     transition: background-color .3s, box-shadow .3s;
   }
   .editor-row {
@@ -545,6 +620,21 @@
     width: 120px;
   }
 
+  .name-author-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .name-author-field {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+  }
+
   .editor-hint {
     font-size: 13px;
     color: #8a97b4;
@@ -592,6 +682,151 @@
   }
 
   /* ============================================================
+     Анализатор
+     ============================================================ */
+  #analyzerArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 920px;
+    padding: 8px;
+  }
+  .ana-header {
+    font-size: 20px;
+    font-weight: 600;
+    color: #cdd6ea;
+    margin: 0;
+    letter-spacing: .3px;
+  }
+  .ana-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .ana-label {
+    font-size: 14px;
+    color: #c0cadd;
+    font-weight: 500;
+    text-align: center;
+  }
+  .ana-board {
+    display: inline-grid;
+    padding: 8px;
+    border-radius: 10px;
+    background: #3f4a64;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1);
+  }
+  .ana-result-boards {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+  }
+  .ana-board-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .ana-board-info {
+    font-size: 12px;
+    color: #a8b3cb;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .ana-controls-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ana-status {
+    font-size: 14px;
+    color: #c0cadd;
+    text-align: center;
+    min-height: 20px;
+    padding: 0 8px;
+    line-height: 1.5;
+    max-width: 100%;
+  }
+  .ana-nav {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  #anaIdxLabel {
+    font-size: 14px;
+    color: #cdd6ea;
+    min-width: 90px;
+    text-align: center;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+  }
+  #anaSymmetryBtn.sym-empty {
+    background: #c94a3a !important;
+    color: #fff !important;
+  }
+  #anaSymmetryBtn.sym-empty:hover:not(:disabled) {
+    background: #e05a4a !important;
+  }
+  .ana-bottom {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    width: 100%;
+  }
+
+  body.light .ana-header { color: #1a2030; }
+  body.light .ana-label { color: #4a5568; }
+  body.light .ana-board {
+    background: #ffffff;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08);
+  }
+  body.light .ana-board-info { color: #7a8098; }
+  body.light .ana-status { color: #4a5568; }
+  body.light #anaIdxLabel { color: #2f3a52; }
+  body.light .ana-bottom {
+    border-top-color: rgba(0, 0, 0, .08);
+  }
+  body.light .ana-cell.ana-empty {
+    background: #eef0f4 !important;
+    box-shadow: inset 0 0 0 2px #d8dde8 !important;
+  }
+  body.light .ana-cell.ana-knight {
+    background: #e8ecf5 !important;
+    box-shadow: inset 0 0 0 2px #c8d0e0 !important;
+  }
+  body.light .ana-cell.ana-knight.ana-w {
+    color: #ffffff;
+    -webkit-text-stroke: 1.2px #1a2030;
+  }
+  body.light .ana-cell.ana-knight.ana-b {
+    color: #1a2030;
+    -webkit-text-stroke: 1px #c8d0e0;
+  }
+  body.light .ana-cell.ana-knight.ana-r {
+    color: #d04040;
+    -webkit-text-stroke: 1.2px #601010;
+  }
+
+  @media (max-width: 560px) {
+    .ana-header { font-size: 17px; }
+    .ana-label { font-size: 13px; }
+    .ana-status { font-size: 13px; }
+  }
+
+  /* ============================================================
      Галерея
      ============================================================ */
   #galleryWrap {
@@ -626,7 +861,7 @@
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 460px) {
-    .gallery-grid { grid-template-columns: 1fr; }
+    .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
   .gallery-author {
@@ -657,6 +892,7 @@
     transition: transform .15s, background .15s, box-shadow .15s;
     user-select: none;
     position: relative;
+    min-width: 0;
   }
   .gallery-tile:hover {
     background: #4f5b78;
@@ -708,6 +944,7 @@
   .gallery-preview-wrap {
     width: 150px;
     height: 150px;
+    max-width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -758,6 +995,7 @@
     text-align: center;
     line-height: 1.7;
     max-width: 660px;
+    padding: 0 8px;
   }
   .info-lines a {
     color: #a8c2ff;
@@ -1002,6 +1240,199 @@
   body.light .info-lines { color: #4a5568; }
   body.light .info-lines a { color: #2f6df6; border-bottom-color: rgba(47, 109, 246, .4); }
   body.light .info-lines a:hover { color: #1a56e0; border-bottom-color: #1a56e0; }
+
+  /* ============================================================
+     МОБИЛЬНАЯ АДАПТАЦИЯ
+     ============================================================ */
+  @media (max-width: 560px) {
+    body {
+      gap: 10px;
+      padding: 12px 8px 24px;
+    }
+
+    h1 {
+      font-size: 20px;
+    }
+    h1 .kn-white,
+    h1 .kn-black {
+      font-size: 22px;
+    }
+
+    .picker {
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      max-width: 100%;
+    }
+    .picker-row-1 {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+    .picker-row-2 {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    #pickerLabel {
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+
+    select,
+    select option,
+    select optgroup {
+      font-size: 13px !important;
+      line-height: 1.3;
+    }
+    select {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+      max-width: none;
+      padding: 8px 10px;
+      text-overflow: ellipsis;
+    }
+
+    .nav-btn {
+      flex-shrink: 0;
+      padding: 6px 10px;
+      font-size: 16px;
+    }
+
+    .gallery-open-btn {
+      padding: 8px 14px;
+      font-size: 14px;
+    }
+
+    #status {
+      font-size: 14px;
+      padding: 0 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    #status.win {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .author-line {
+      font-size: 13px;
+      line-height: 1.4;
+      padding: 0 6px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
+    }
+
+    .hint {
+      font-size: 13px;
+      padding: 0 6px;
+    }
+
+    #board {
+      --gap: 6px;
+    }
+
+    .controls-row {
+      gap: 6px;
+    }
+    button {
+      padding: 9px 14px;
+      font-size: 14px;
+    }
+
+    .editor-panel {
+      max-width: 100%;
+      padding: 12px 12px;
+      gap: 8px;
+    }
+    .name-author-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+    .name-author-field {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3px;
+      width: 100%;
+    }
+    .editor-panel input[type="text"]#editor-name,
+    .editor-panel input[type="text"]#editor-author {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .name-author-field .editor-label {
+      text-align: left;
+      min-width: auto;
+    }
+
+    .gallery-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .gallery-tile {
+      padding: 8px 6px;
+      gap: 6px;
+    }
+    .gallery-tile-name {
+      font-size: 12px;
+      white-space: normal;
+      word-break: break-word;
+      max-height: 2.6em;
+      overflow: hidden;
+    }
+    .gallery-preview-wrap {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      max-width: 140px;
+    }
+    .gallery-author {
+      font-size: 15px;
+      padding: 6px 2px 2px;
+    }
+    .gallery-title {
+      font-size: 17px;
+    }
+    .gallery-topbar {
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    h1 { font-size: 18px; }
+    h1 .kn-white, h1 .kn-black { font-size: 20px; }
+
+    #pickerLabel { font-size: 12px; }
+
+    select,
+    select option,
+    select optgroup {
+      font-size: 12px !important;
+    }
+    select {
+      padding: 7px 8px;
+    }
+
+    #status { font-size: 13px; }
+    .author-line { font-size: 12px; }
+    .hint { font-size: 12px; }
+    button { font-size: 13px; padding: 8px 12px; }
+
+    .gallery-grid { gap: 8px; }
+    .gallery-tile-name { font-size: 11px; }
+  }
 </style>
 </head>
 <body>
@@ -1010,13 +1441,17 @@
 
   <div id="gameArea">
     <div class="picker" id="pickerRow">
-      <label for="puzzle" id="pickerLabel">Головоломка:</label>
-      <button id="prevPuzzle" class="nav-btn" title="Предыдущая">‹</button>
-      <select id="puzzle"></select>
-      <button id="nextPuzzle" class="nav-btn" title="Следующая">›</button>
-      <button id="galleryOpenBtn" class="gallery-open-btn">
-        <span class="gallery-icon">▦</span><span id="galleryBtnLabel">Галерея</span>
-      </button>
+      <div class="picker-row-1">
+        <label for="puzzle" id="pickerLabel">Головоломка:</label>
+        <button id="prevPuzzle" class="nav-btn" title="Предыдущая">‹</button>
+        <select id="puzzle"></select>
+        <button id="nextPuzzle" class="nav-btn" title="Следующая">›</button>
+      </div>
+      <div class="picker-row-2">
+        <button id="galleryOpenBtn" class="gallery-open-btn">
+          <span class="gallery-icon">▦</span><span id="galleryBtnLabel">Галерея</span>
+        </button>
+      </div>
     </div>
 
     <p class="hint" id="hintEl"></p>
@@ -1030,12 +1465,15 @@
     </div>
 
     <div class="author-line" id="authorLine"></div>
+    <div class="max-step-line" id="maxStepLine" style="display:none"></div>
 
     <div id="boardWrap">
       <div id="board">
         <div id="flyer"></div>
       </div>
     </div>
+
+    <div class="editor-counts" id="editorCounts" style="display:none"></div>
 
     <div id="status"></div>
 
@@ -1060,11 +1498,15 @@
     </div>
 
     <div class="editor-panel" id="editorPanel" style="display:none">
-      <div class="editor-row">
-        <span class="editor-label" id="lblName">Название:</span>
-        <input type="text" id="editor-name" placeholder="Новый уровень">
-        <span class="editor-label" id="lblAuthor">Автор:</span>
-        <input type="text" id="editor-author" placeholder="Gelo">
+      <div class="editor-row name-author-row">
+        <div class="name-author-field">
+          <span class="editor-label" id="lblName">Название:</span>
+          <input type="text" id="editor-name" placeholder="Новый уровень">
+        </div>
+        <div class="name-author-field">
+          <span class="editor-label" id="lblAuthor">Автор:</span>
+          <input type="text" id="editor-author" placeholder="Gelo">
+        </div>
       </div>
 
       <div class="editor-row">
@@ -1091,9 +1533,46 @@
 
       <div class="editor-row">
         <button id="editor-run" class="solve">▶ Запустить</button>
+        <button id="editor-analyzer" class="hint-btn">🔬 Анализатор</button>
         <button id="editor-cancel" class="secondary">✕ Отмена</button>
         <button id="editor-delete" class="danger" style="display:none">🗑 Удалить</button>
       </div>
+    </div>
+  </div>
+
+  <div id="analyzerArea" style="display:none">
+    <h2 class="ana-header">🔬 Анализатор доски</h2>
+
+    <div class="ana-section">
+      <div class="ana-label">Исходная доска:</div>
+      <div id="anaSourceBoard" class="ana-board"></div>
+    </div>
+
+    <div class="ana-controls-row">
+      <button id="anaSearchBtn" class="solve">🔍 Поиск</button>
+      <button id="anaAnalysisBtn" class="hint-btn" disabled>🧩 Анализ</button>
+      <button id="anaStopBtn" class="solve stop" style="display:none">⏹ Стоп</button>
+    </div>
+
+    <div id="anaStatus" class="ana-status"></div>
+
+    <div class="ana-section" id="anaResultSection" style="display:none">
+      <div class="ana-label" id="anaResultLabel">Найденные состояния:</div>
+      <div id="anaResultBoards" class="ana-result-boards"></div>
+      <div class="ana-nav">
+        <button id="anaFirstBtn" class="nav-btn" title="В начало">«</button>
+        <button id="anaPrevBtn" class="nav-btn" title="Назад">‹</button>
+        <span id="anaIdxLabel">0 / 0</span>
+        <button id="anaNextBtn" class="nav-btn" title="Вперёд">›</button>
+        <button id="anaLastBtn" class="nav-btn" title="В конец">»</button>
+        <button id="anaSwapBtn" class="secondary">⇄ Поменять</button>
+        <button id="anaSymmetryBtn" class="secondary" style="display:none">◇ Только симметричные</button>
+      </div>
+    </div>
+
+    <div class="ana-bottom">
+      <button id="anaRunBtn" class="solve">▶ Запустить</button>
+      <button id="anaCancelBtn" class="secondary">✕ Отмена</button>
     </div>
   </div>
 
@@ -1123,9 +1602,9 @@
      Встроенные головоломки
      ============================================================ */
   const BUILTIN_PUZZLES = [
-    { name: 'Шесть на шесть', nameEn: 'Six by six', author: 'Gelo', rotated: false,
+    { name: 'Шесть на шесть', nameEn: 'Six by six', author: 'Gelo', rotated: false, maxStep: 30,
       data: [['x','w','_','b','x'],['w','w','x','b','b'],['w','w','x','b','b'],['x','w','_','b','x']] },
-    { name: 'Эх вы, кони - 1', nameEn: 'Hey you, horses - 1', author: 'Gelo', rotated: false,
+    { name: 'Эх вы, кони - 1', nameEn: 'Hey you, horses - 1', author: 'Gelo', rotated: false, maxStep: 24,
       data: [['x','_','x'],['w','x','b'],['w','x','b'],['w','x','b'],['x','_','x']] },
     { name: 'Эх вы, кони - 2', nameEn: 'Hey you, horses - 2', author: 'Gelo', rotated: false,
       data: [['x','_','x'],['w','x','b'],['w','x','b'],['w','x','b'],['w','x','b'],['x','_','x']] },
@@ -1204,7 +1683,10 @@
       authorLabel: 'Название:',
       authorOf: 'Автор:',
       moves: 'Ходов:',
-      winMessage: function (n, p) { return '🎉 Победа! Все кони поменялись местами за ' + n + ' ' + p + '.'; },
+      winMessage: function (n, p) { return '🎉 Поздравляем! Вы нашли решение за ' + n + ' ' + p + '.'; },
+      maxStepHint:    function (n, p) { return '🎯 Постарайтесь найти оптимальное решение за ' + n + ' ' + p + '.'; },
+      winOptimal:     function (n, p) { return '🎉 Победа! Вы нашли оптимальное решение за ' + n + ' ' + p + '!'; },
+      winNotOptimal:  function (m, mp) { return '🎉 Поздравляем! Вы нашли решение за ' + m + ' ' + mp + '. Попробуйте его улучшить.'; },
       searching: 'Ищу решение…',
       searchingDepth: function (d, p, t) { return 'Ищу решение… глубина: ' + d + ' ' + p + '. время ' + t + ' сек…'; },
       hintSearching: function (t) { return 'Ищу подсказку… время ' + t + ' сек…'; },
@@ -1222,6 +1704,7 @@
       btnSolve: '🎯 Решить', btnStop: '⏹ Стоп', btnEdit: '✎ Редактировать',
       btnHint: '💡 Подсказка',
       btnDelete: '🗑 Удалить',
+      btnAnalyzer: '🔬 Анализатор',
       lblName: 'Название:', lblAuthor: 'Автор:',
       lblSize: 'Размер:', lblSizeHint: 'строки × столбцы (1–10)',
       lblFill: 'Заполнить:', lblBrush: 'Кисть:',
@@ -1252,7 +1735,13 @@
       galleryOpen: 'Галерея', galleryTitle: 'Галерея головоломок', galleryBack: '← Назад',
       copyAllOk: '✓ Скопированы все головоломки', copyAllFail: '⚠ Не удалось скопировать',
       authorUser: 'Мои уровни',
-      deleteConfirm: 'Удалить этот уровень?'
+      deleteConfirm: 'Удалить этот уровень?',
+      anaShowSym: '◇ Только симметричные',
+      anaShowAll: '◇ Все',
+      anaShowSymEmpty: '⚠ Симметричных не найдено',
+      cntWhite: 'Белые:',
+      cntBlack: 'Чёрные:',
+      cntRed:   'Красные:'
     },
     en: {
       title: 'Knight Swap',
@@ -1260,7 +1749,10 @@
       hintPlay: 'Goal — swap white and black knights,<br>red ponies must return to their starting squares.',
       hintEdit: 'Editor: pick a brush and click cells (drag to paint).<br>Set the name and size, rotate if needed, then press "Start".',
       authorLabel: 'Name:', authorOf: 'Author:', moves: 'Moves:',
-      winMessage: function (n, p) { return '🎉 Victory! All knights swapped in ' + n + ' ' + p + '.'; },
+      winMessage: function (n, p) { return '🎉 Congratulations! You found a solution in ' + n + ' ' + p + '.'; },
+      maxStepHint:    function (n, p) { return '🎯 Try to find the optimal solution in ' + n + ' ' + p + '.'; },
+      winOptimal:     function (n, p) { return '🎉 Victory! You found the optimal solution in ' + n + ' ' + p + '!'; },
+      winNotOptimal:  function (m, mp) { return '🎉 Congratulations! You found a solution in ' + m + ' ' + mp + '. Try to improve it.'; },
       searching: 'Searching for a solution…',
       searchingDepth: function (d, p, t) { return 'Searching… depth: ' + d + ' ' + p + '. time ' + t + ' s…'; },
       hintSearching: function (t) { return 'Looking for a hint… time ' + t + ' s…'; },
@@ -1278,6 +1770,7 @@
       btnSolve: '🎯 Solve', btnStop: '⏹ Stop', btnEdit: '✎ Edit',
       btnHint: '💡 Hint',
       btnDelete: '🗑 Delete',
+      btnAnalyzer: '🔬 Analyzer',
       lblName: 'Name:', lblAuthor: 'Author:',
       lblSize: 'Size:', lblSizeHint: 'rows × cols (1–10)',
       lblFill: 'Fill:', lblBrush: 'Brush:',
@@ -1307,7 +1800,13 @@
       galleryOpen: 'Gallery', galleryTitle: 'Puzzle gallery', galleryBack: '← Back',
       copyAllOk: '✓ All puzzles copied', copyAllFail: '⚠ Failed to copy',
       authorUser: 'My levels',
-      deleteConfirm: 'Delete this level?'
+      deleteConfirm: 'Delete this level?',
+      anaShowSym: '◇ Symmetric only',
+      anaShowAll: '◇ All',
+      anaShowSymEmpty: '⚠ No symmetric',
+      cntWhite: 'White:',
+      cntBlack: 'Black:',
+      cntRed:   'Red:'
     }
   };
 
@@ -1334,12 +1833,273 @@
   const KNIGHT_STEPS = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
   const ANIM_MS = 400;
   const STEP_MS = 500;
-  const MAX_STATES = 20000000;
   const MAX_ITER   = 100000;
   const NUM_LIMIT = 26;
   const BIG_LIMIT = 32;
   const LETTERS = 'ABCDEFGHIJ';
   const LABEL_SIZE = 14;
+
+  /* ============================================================
+     Лимиты состояний с учётом памяти устройства
+     ============================================================ */
+  const MAX_STATES_TARGET     = 100000000;
+  const MAX_STATES_TARGET_STR = 10000000;
+
+  function computeMaxStates(baseTarget, bytesPerState) {
+    const dm = (typeof navigator !== 'undefined') ? navigator.deviceMemory : undefined;
+    if (typeof dm === 'number' && dm > 0) {
+      const budgetBytes = dm * 1024 * 1024 * 1024 * 0.30;
+      const states = Math.floor(budgetBytes / bytesPerState);
+      return Math.min(baseTarget, Math.max(5000000, states));
+    }
+    return baseTarget;
+  }
+
+  const MAX_STATES     = computeMaxStates(MAX_STATES_TARGET, 30);
+  const MAX_STATES_STR = computeMaxStates(MAX_STATES_TARGET_STR, 100);
+
+  function isMemoryHigh() {
+    if (typeof performance !== 'undefined' && performance.memory) {
+      const used = performance.memory.usedJSHeapSize;
+      const lim  = performance.memory.jsHeapSizeLimit;
+      if (typeof used === 'number' && typeof lim === 'number' && lim > 0) {
+        return used > lim * 0.75;
+      }
+    }
+    return false;
+  }
+
+  /* ============================================================
+     Компактные структуры данных для решателя
+     ============================================================ */
+
+  class Int32Vec {
+    constructor(cap) {
+      this.arr = new Int32Array(cap || 256);
+      this.len = 0;
+    }
+    push(v) {
+      if (this.len === this.arr.length) {
+        let na;
+        try { na = new Int32Array(this.arr.length * 2); }
+        catch (e) { throw new Error('__OOM__'); }
+        na.set(this.arr);
+        this.arr = na;
+      }
+      this.arr[this.len++] = v;
+    }
+    get(i) { return this.arr[i]; }
+  }
+
+  class Uint8Vec {
+    constructor(cap) {
+      this.arr = new Uint8Array(cap || 256);
+      this.len = 0;
+    }
+    push(v) {
+      if (this.len === this.arr.length) {
+        let na;
+        try { na = new Uint8Array(this.arr.length * 2); }
+        catch (e) { throw new Error('__OOM__'); }
+        na.set(this.arr);
+        this.arr = na;
+      }
+      this.arr[this.len++] = v;
+    }
+    get(i) { return this.arr[i]; }
+  }
+
+  class NumericMap {
+    constructor(initialCapacity) {
+      let cap = 1 << 14;
+      while (cap < (initialCapacity || 0)) cap <<= 1;
+      this._cap = cap;
+      this._mask = cap - 1;
+      this._keys = new Float64Array(cap);
+      this._keys.fill(-1);
+      this._values = new Int32Array(cap);
+      this._size = 0;
+      this._threshold = Math.floor(cap * 0.85);
+    }
+    get size() { return this._size; }
+
+    _hash(v) {
+      const lo = v >>> 0;
+      const hi = Math.floor(v / 4294967296) >>> 0;
+      let h = (lo ^ Math.imul(hi, 0x9E3779B1)) >>> 0;
+      h = Math.imul(h ^ (h >>> 16), 0x85ebca6b);
+      h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+      return (h ^ (h >>> 16)) >>> 0;
+    }
+
+    _resize() {
+      const oldCap = this._cap;
+      const oldKeys = this._keys;
+      const oldValues = this._values;
+      const newCap = oldCap << 1;
+      let newKeys, newValues;
+      try {
+        newKeys = new Float64Array(newCap);
+        newKeys.fill(-1);
+        newValues = new Int32Array(newCap);
+      } catch (e) { throw new Error('__OOM__'); }
+      this._cap = newCap;
+      this._mask = newCap - 1;
+      this._threshold = Math.floor(newCap * 0.85);
+      for (let i = 0; i < oldCap; i++) {
+        const k = oldKeys[i];
+        if (k === -1) continue;
+        let pos = this._hash(k) & this._mask;
+        while (newKeys[pos] !== -1) pos = (pos + 1) & this._mask;
+        newKeys[pos] = k;
+        newValues[pos] = oldValues[i];
+      }
+      this._keys = newKeys;
+      this._values = newValues;
+    }
+
+    has(key) {
+      const keys = this._keys;
+      let pos = this._hash(key) & this._mask;
+      while (true) {
+        const k = keys[pos];
+        if (k === -1) return false;
+        if (k === key) return true;
+        pos = (pos + 1) & this._mask;
+      }
+    }
+
+    get(key) {
+      const keys = this._keys;
+      let pos = this._hash(key) & this._mask;
+      while (true) {
+        const k = keys[pos];
+        if (k === -1) return -1;
+        if (k === key) return this._values[pos];
+        pos = (pos + 1) & this._mask;
+      }
+    }
+
+    set(key, value) {
+      if (this._size >= this._threshold) this._resize();
+      const keys = this._keys;
+      let pos = this._hash(key) & this._mask;
+      while (true) {
+        const k = keys[pos];
+        if (k === -1) {
+          keys[pos] = key;
+          this._values[pos] = value;
+          this._size++;
+          return;
+        }
+        if (k === key) {
+          this._values[pos] = value;
+          return;
+        }
+        pos = (pos + 1) & this._mask;
+      }
+    }
+  }
+
+  class NumericMap64 {
+    constructor(initialCapacity) {
+      let cap = 1 << 14;
+      while (cap < (initialCapacity || 0)) cap <<= 1;
+      this._cap = cap;
+      this._mask = cap - 1;
+      this._keysLo = new Float64Array(cap);
+      this._keysLo.fill(-1);
+      this._keysHi = new Float64Array(cap);
+      this._values = new Int32Array(cap);
+      this._size = 0;
+      this._threshold = Math.floor(cap * 0.85);
+    }
+    get size() { return this._size; }
+
+    _hash(lo, hi) {
+      let h = (lo ^ Math.imul(hi, 0x9E3779B1)) >>> 0;
+      h = Math.imul(h ^ (h >>> 16), 0x85ebca6b);
+      h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+      return (h ^ (h >>> 16)) >>> 0;
+    }
+
+    _resize() {
+      const oldCap = this._cap;
+      const oldKeysLo = this._keysLo;
+      const oldKeysHi = this._keysHi;
+      const oldValues = this._values;
+      const newCap = oldCap << 1;
+      let newKeysLo, newKeysHi, newValues;
+      try {
+        newKeysLo = new Float64Array(newCap);
+        newKeysLo.fill(-1);
+        newKeysHi = new Float64Array(newCap);
+        newValues = new Int32Array(newCap);
+      } catch (e) { throw new Error('__OOM__'); }
+      this._cap = newCap;
+      this._mask = newCap - 1;
+      this._threshold = Math.floor(newCap * 0.85);
+      for (let i = 0; i < oldCap; i++) {
+        const lo = oldKeysLo[i];
+        if (lo === -1) continue;
+        const hi = oldKeysHi[i];
+        let pos = this._hash(lo, hi) & this._mask;
+        while (newKeysLo[pos] !== -1) pos = (pos + 1) & this._mask;
+        newKeysLo[pos] = lo;
+        newKeysHi[pos] = hi;
+        newValues[pos] = oldValues[i];
+      }
+      this._keysLo = newKeysLo;
+      this._keysHi = newKeysHi;
+      this._values = newValues;
+    }
+
+    has(lo, hi) {
+      const keysLo = this._keysLo;
+      const keysHi = this._keysHi;
+      let pos = this._hash(lo, hi) & this._mask;
+      while (true) {
+        const k = keysLo[pos];
+        if (k === -1) return false;
+        if (k === lo && keysHi[pos] === hi) return true;
+        pos = (pos + 1) & this._mask;
+      }
+    }
+
+    get(lo, hi) {
+      const keysLo = this._keysLo;
+      const keysHi = this._keysHi;
+      let pos = this._hash(lo, hi) & this._mask;
+      while (true) {
+        const k = keysLo[pos];
+        if (k === -1) return -1;
+        if (k === lo && keysHi[pos] === hi) return this._values[pos];
+        pos = (pos + 1) & this._mask;
+      }
+    }
+
+    set(lo, hi, value) {
+      if (this._size >= this._threshold) this._resize();
+      const keysLo = this._keysLo;
+      const keysHi = this._keysHi;
+      let pos = this._hash(lo, hi) & this._mask;
+      while (true) {
+        const k = keysLo[pos];
+        if (k === -1) {
+          keysLo[pos] = lo;
+          keysHi[pos] = hi;
+          this._values[pos] = value;
+          this._size++;
+          return;
+        }
+        if (k === lo && keysHi[pos] === hi) {
+          this._values[pos] = value;
+          return;
+        }
+        pos = (pos + 1) & this._mask;
+      }
+    }
+  }
 
   const STORAGE_KEY = 'knightSwap_state_v2';
   const USER_PUZZLES_KEY = 'knightSwap_user_levels_v1';
@@ -1356,6 +2116,7 @@
   const statusEl     = document.getElementById('status');
   const hintEl       = document.getElementById('hintEl');
   const authorLine   = document.getElementById('authorLine');
+  const maxStepLine  = document.getElementById('maxStepLine');
   const pickerRow    = document.getElementById('pickerRow');
   const pickerLabel  = document.getElementById('pickerLabel');
   const h1Title      = document.getElementById('h1Title');
@@ -1392,6 +2153,8 @@
   const runBtn       = document.getElementById('editor-run');
   const cancelBtn    = document.getElementById('editor-cancel');
   const deleteBtn    = document.getElementById('editor-delete');
+  const editorAnalyzerBtn = document.getElementById('editor-analyzer');
+  const editorCounts = document.getElementById('editorCounts');
   const fillXBtn     = document.getElementById('fillX');
   const fillEmptyBtn = document.getElementById('fillEmpty');
   const lblName      = document.getElementById('lblName');
@@ -1410,6 +2173,25 @@
   const langBtn      = document.getElementById('langBtn');
   const themeBtn     = document.getElementById('themeBtn');
 
+  const analyzerArea       = document.getElementById('analyzerArea');
+  const anaSourceBoardEl   = document.getElementById('anaSourceBoard');
+  const anaResultSection   = document.getElementById('anaResultSection');
+  const anaResultBoards    = document.getElementById('anaResultBoards');
+  const anaResultLabel     = document.getElementById('anaResultLabel');
+  const anaStatusEl        = document.getElementById('anaStatus');
+  const anaIdxLabel        = document.getElementById('anaIdxLabel');
+  const anaSearchBtn       = document.getElementById('anaSearchBtn');
+  const anaAnalysisBtn     = document.getElementById('anaAnalysisBtn');
+  const anaStopBtn         = document.getElementById('anaStopBtn');
+  const anaFirstBtn        = document.getElementById('anaFirstBtn');
+  const anaPrevBtn         = document.getElementById('anaPrevBtn');
+  const anaNextBtn         = document.getElementById('anaNextBtn');
+  const anaLastBtn         = document.getElementById('anaLastBtn');
+  const anaSwapBtn         = document.getElementById('anaSwapBtn');
+  const anaSymmetryBtn     = document.getElementById('anaSymmetryBtn');
+  const anaRunBtn          = document.getElementById('anaRunBtn');
+  const anaCancelBtn       = document.getElementById('anaCancelBtn');
+
   const DEFAULT_AUTHOR = 'Gelo';
   const USER_AUTHOR    = 'User';
 
@@ -1418,6 +2200,7 @@
      ============================================================ */
   let START, GOAL, ROWS, COLS, rotated;
   let currentName = '', currentNameEn = '', currentAuthor = '';
+  let currentMaxStep = 0;
   let currentPuzzleIdx = 0;
   let cells, cellIndex, neighbors, N;
   let POW4, POW4_BIG;
@@ -1437,11 +2220,12 @@
   let statusState = { key: 'moves', args: [] };
 
   let editorMode = false;
+  let analyzerMode = false;
   let galleryMode = false;
   let editorSourceIdx = -1;
   const editor = {
     rows: 4, cols: 5, data: [], tool: 'w', rotated: false,
-    name: 'Новый уровень', author: DEFAULT_AUTHOR
+    name: 'Новый уровень', author: DEFAULT_AUTHOR, maxStep: 0
   };
   let editorCells = [];
   let painting = false;
@@ -1450,6 +2234,34 @@
   let searchProgressStart = 0;
   let searchProgressKind  = 'search';
   let lastDepthTotal = 0;
+
+  /* ============================================================
+     Состояние анализатора
+     ============================================================ */
+  const ANALYZER_MAX_STATES    = 3000000;
+  const ANALYZER_MAX_DEPTH     = 500;
+  const ANALYZER_LEVELS_KEEP   = 25;
+  const ANALYZER_LEVEL_SAMPLE  = 50;
+  const ANALYZER_EDGE_FRACTION = 0.25;
+
+  let analyzerCtx = null;
+  let analyzerSourceBoard = null;
+  let analyzerLevels = null;
+  let analyzerMaxDepth = 0;
+  let analyzerVisitedCount = 0;
+  let analyzerCapped = false;
+  let analyzerFurthest = [];
+  let analyzerFurthestIdx = 0;
+  let analyzerResults = [];
+  let analyzerResultsFull = [];
+  let analyzerSymmetryOnly = false;
+  let analyzerSymmetryEmpty = false;
+  let analyzerResultIdx = 0;
+  let analyzerDisplayMode = 'furthest';
+  let analyzerSearchGen = 0;
+  let analyzerSearchRunning = false;
+  let analyzerAnalysisGen = 0;
+  let analyzerSearchStartTime = 0;
 
   /* ============================================================
      Вспомогательные
@@ -1540,7 +2352,8 @@
         out.push({
           name: name, nameEn: name, author: author,
           data: p.data.map(function (row) { return row.slice(); }),
-          rotated: !!p.rotated
+          rotated: !!p.rotated,
+          maxStep: (typeof p.maxStep === 'number' && p.maxStep > 0) ? p.maxStep : 0
         });
       }
       return out;
@@ -1553,12 +2366,16 @@
       for (let i = 0; i < PUZZLES.length; i++) {
         if (userFlag[i]) {
           const p = PUZZLES[i];
-          list.push({
+          const entry = {
             name: p.name,
             author: p.author || USER_AUTHOR,
             data: p.data.map(function (row) { return row.slice(); }),
             rotated: !!p.rotated
-          });
+          };
+          if (typeof p.maxStep === 'number' && p.maxStep > 0) {
+            entry.maxStep = p.maxStep;
+          }
+          list.push(entry);
         }
       }
       localStorage.setItem(USER_PUZZLES_KEY, JSON.stringify(list));
@@ -1577,7 +2394,7 @@
   }
 
   /* ============================================================
-     Игровое состояние (тема, язык, последний уровень)
+     Игровое состояние
      ============================================================ */
   function saveGameState() {
     try {
@@ -1604,9 +2421,9 @@
   /* ============================================================
      Статус
      ============================================================ */
-  function setStatus(key, ...args) {
+  function setStatus(key) {
     statusState.key = key;
-    statusState.args = args;
+    statusState.args = Array.prototype.slice.call(arguments, 1);
     renderStatus();
   }
 
@@ -1615,7 +2432,15 @@
     let text = '';
     switch (statusState.key) {
       case 'moves': text = s.moves + ' ' + moves; break;
-      case 'win': text = s.winMessage(moves, fmtMoves(moves)); break;
+      case 'win':
+        if (currentMaxStep > 0) {
+          text = (moves <= currentMaxStep)
+            ? s.winOptimal(moves, fmtMoves(moves))
+            : s.winNotOptimal(moves, fmtMoves(moves));
+        } else {
+          text = s.winMessage(moves, fmtMoves(moves));
+        }
+        break;
       case 'searching': text = s.searching; break;
       case 'searchingDepth':
         text = s.searchingDepth(statusState.args[0],
@@ -1694,6 +2519,7 @@
     runBtn.textContent    = t('btnRun');
     cancelBtn.textContent = t('btnCancel');
     deleteBtn.textContent = t('btnDelete');
+    if (editorAnalyzerBtn) editorAnalyzerBtn.textContent = t('btnAnalyzer');
     undoBtn.textContent   = t('btnUndo');
     redoBtn.textContent   = t('btnRedo');
     resetBtn.textContent  = t('btnReset');
@@ -1723,11 +2549,21 @@
     updateSolveButton();
     updateRotateButton();
     updateAuthorLine();
+    updateMaxStepLine();
     renderStatus();
     renderPuzzleSelect();
 
-    if (editorMode) hintEl.innerHTML = t('hintEdit');
+    if (editorMode) {
+      if (analyzerMode) {
+        hintEl.style.display = 'none';
+      } else {
+        hintEl.innerHTML = t('hintEdit');
+      }
+      updateEditorCounts();
+    }
     if (galleryMode) renderGallery();
+
+    if (analyzerMode) updateAnaButtons();
   }
 
   function applyTheme() {
@@ -1894,12 +2730,14 @@
     ROWS    = START.length;
     COLS    = START[0].length;
     rotated = !!p.rotated;
-    currentName   = p.name || '';
-    currentNameEn = p.nameEn || p.name || '';
-    currentAuthor = p.author || DEFAULT_AUTHOR;
+    currentName    = p.name || '';
+    currentNameEn  = p.nameEn || p.name || '';
+    currentAuthor  = p.author || DEFAULT_AUTHOR;
+    currentMaxStep = (typeof p.maxStep === 'number' && p.maxStep > 0) ? p.maxStep : 0;
     if (typeof idx === 'number') currentPuzzleIdx = idx;
 
     updateAuthorLine();
+    updateMaxStepLine();
 
     GOAL = START.map(row => row.map(v => v === 'w' ? 'b' : v === 'b' ? 'w' : v));
 
@@ -1965,6 +2803,15 @@
     }
   }
 
+  function updateMaxStepLine() {
+    if (currentMaxStep > 0 && !editorMode && !galleryMode) {
+      maxStepLine.textContent = t('maxStepHint')(currentMaxStep, fmtMoves(currentMaxStep));
+      maxStepLine.style.display = '';
+    } else {
+      maxStepLine.style.display = 'none';
+    }
+  }
+
   /* ============================================================
      Список головоломок
      ============================================================ */
@@ -2002,7 +2849,7 @@
     if (!isNaN(cur) && cur >= 0 && cur < PUZZLES.length) {
       puzzleSel.value = String(cur);
     } else {
-      puzzleSel.value = '0';
+      puzzleSel.value = String(currentPuzzleIdx >= 0 && currentPuzzleIdx < PUZZLES.length ? currentPuzzleIdx : 0);
     }
     updateNavButtons();
   }
@@ -2020,6 +2867,7 @@
   function loadPuzzle(idx) {
     if (idx < 0 || idx >= PUZZLES.length) idx = 0;
     currentPuzzleIdx = idx;
+    puzzleSel.value = String(idx);
     loadPuzzleData(PUZZLES[idx], idx);
   }
 
@@ -2212,6 +3060,8 @@
         cell.addEventListener('click', (function (rr, cc) {
           return function () { onCellClick(rr, cc); };
         })(r, c));
+        cell.dataset.r = String(r);
+        cell.dataset.c = String(c);
         boardEl.appendChild(cell);
       }
     }
@@ -2529,9 +3379,17 @@
     }
     if (startKey === goalKey) return [];
 
-    const mapA = new Map(), mapB = new Map();
-    const prevIdxA = [-1], fromA = [0], toA = [0];
-    const prevIdxB = [-1], fromB = [0], toB = [0];
+    const mapA = new NumericMap(1 << 14);
+    const mapB = new NumericMap(1 << 14);
+
+    const prevIdxA = new Int32Vec(256); prevIdxA.push(-1);
+    const fromA    = new Uint8Vec(256); fromA.push(0);
+    const toA      = new Uint8Vec(256); toA.push(0);
+
+    const prevIdxB = new Int32Vec(256); prevIdxB.push(-1);
+    const fromB    = new Uint8Vec(256); fromB.push(0);
+    const toB      = new Uint8Vec(256); toB.push(0);
+
     mapA.set(startKey, 0);
     mapB.set(goalKey, 0);
 
@@ -2575,7 +3433,7 @@
             if (v === 0) continue;
             const nk = key + v * POW4[e] - v * POW4[nb];
             if (map.has(nk)) continue;
-            const newIdx = prevArr.length;
+            const newIdx = prevArr.len;
             map.set(nk, newIdx);
             prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
             if (other.has(nk)) { meetKey = nk; break; }
@@ -2588,50 +3446,157 @@
         if (onProgress) onProgress(depthA, depthB, true);
         const pathA = [];
         let idx = mapA.get(meetKey);
-        while (prevIdxA[idx] !== -1) {
-          pathA.push([fromA[idx], toA[idx]]);
-          idx = prevIdxA[idx];
+        while (prevIdxA.get(idx) !== -1) {
+          pathA.push([fromA.get(idx), toA.get(idx)]);
+          idx = prevIdxA.get(idx);
         }
         pathA.reverse();
         const pathB = [];
         idx = mapB.get(meetKey);
-        while (prevIdxB[idx] !== -1) {
-          pathB.push([toB[idx], fromB[idx]]);
-          idx = prevIdxB[idx];
+        while (prevIdxB.get(idx) !== -1) {
+          pathB.push([toB.get(idx), fromB.get(idx)]);
+          idx = prevIdxB.get(idx);
         }
         return pathA.concat(pathB);
       }
       if (expandA) { frontierA = nextFrontier; } else { frontierB = nextFrontier; }
       if (onProgress) onProgress(depthA, depthB, false);
       await new Promise(r => setTimeout(r, 0));
+      if (isMemoryHigh()) throw new Error('__OOM__');
     }
     return null;
   }
 
-  async function findSolution(myGen, onProgress) {
-    if (N <= NUM_LIMIT) return await findSolutionNum(myGen, onProgress);
-    const useStrings = (N > BIG_LIMIT);
-    let startKey, goalKey;
-    if (useStrings) {
-      startKey = encodeBoard(board);
-      goalKey  = encodeBoard(GOAL);
-    } else {
-      let sk = 0n, gk = 0n;
-      for (let i = 0; i < N; i++) {
-        const r = cells[i][0], c = cells[i][1];
-        const v = board[r][c];
-        if (v !== '_') {
-          const vv = v === 'w' ? 1n : v === 'b' ? 2n : 3n;
-          sk += vv * POW4_BIG[i];
+  async function findSolutionNum64(myGen, onProgress) {
+    let startLo = 0, startHi = 0, goalLo = 0, goalHi = 0;
+    for (let i = 0; i < N; i++) {
+      const r = cells[i][0], c = cells[i][1];
+      const v = board[r][c];
+      const g = GOAL[r][c];
+      const code  = v === '_' ? 0 : (v === 'w' ? 1 : (v === 'b' ? 2 : 3));
+      const gcode = g === '_' ? 0 : (g === 'w' ? 1 : (g === 'b' ? 2 : 3));
+      if (i < 16) {
+        startLo += code  * POW4[i];
+        goalLo  += gcode * POW4[i];
+      } else {
+        startHi += code  * POW4[i - 16];
+        goalHi  += gcode * POW4[i - 16];
+      }
+    }
+    if (startLo === goalLo && startHi === goalHi) return [];
+
+    const mapA = new NumericMap64(1 << 14);
+    const mapB = new NumericMap64(1 << 14);
+
+    const prevIdxA = new Int32Vec(256); prevIdxA.push(-1);
+    const fromA    = new Uint8Vec(256); fromA.push(0);
+    const toA      = new Uint8Vec(256); toA.push(0);
+
+    const prevIdxB = new Int32Vec(256); prevIdxB.push(-1);
+    const fromB    = new Uint8Vec(256); fromB.push(0);
+    const toB      = new Uint8Vec(256); toB.push(0);
+
+    mapA.set(startLo, startHi, 0);
+    mapB.set(goalLo, goalHi, 0);
+
+    let frontierA = [[startLo, startHi]];
+    let frontierB = [[goalLo, goalHi]];
+    let depthA = 0, depthB = 0;
+    const state = new Uint8Array(N);
+
+    for (let iter = 0; iter < MAX_ITER; iter++) {
+      if (searchGeneration !== myGen) return null;
+      if (frontierA.length === 0 && frontierB.length === 0) throw new Error('__UNSOLVABLE__');
+      if (mapA.size + mapB.size > MAX_STATES) throw new Error('__OOM__');
+
+      let expandA;
+      if (frontierA.length === 0) expandA = false;
+      else if (frontierB.length === 0) expandA = true;
+      else expandA = frontierA.length <= frontierB.length;
+
+      const frontier = expandA ? frontierA : frontierB;
+      const map      = expandA ? mapA      : mapB;
+      const other    = expandA ? mapB      : mapA;
+      const prevArr  = expandA ? prevIdxA  : prevIdxB;
+      const fromArr  = expandA ? fromA     : fromB;
+      const toArr    = expandA ? toA       : toB;
+
+      if (expandA) depthA++; else depthB++;
+      const nextFrontier = [];
+      let meetLo = -1, meetHi = 0;
+
+      for (let fi = 0; fi < frontier.length && meetLo < 0; fi++) {
+        if ((fi & 1023) === 0 && searchGeneration !== myGen) return null;
+        const keyLo = frontier[fi][0];
+        const keyHi = frontier[fi][1];
+        const keyIdx = map.get(keyLo, keyHi);
+
+        let l = keyLo, h = keyHi;
+        for (let i = 0; i < N; i++) {
+          if (i < 16) {
+            const s = l & 3;
+            state[i] = s;
+            l = (l - s) / 4;
+          } else {
+            const s = h & 3;
+            state[i] = s;
+            h = (h - s) / 4;
+          }
         }
-        const g = GOAL[r][c];
-        if (g !== '_') {
-          const gv = g === 'w' ? 1n : g === 'b' ? 2n : 3n;
-          gk += gv * POW4_BIG[i];
+
+        for (let e = 0; e < N && meetLo < 0; e++) {
+          if (state[e] !== 0) continue;
+          const nbrs = neighbors[e];
+          for (let j = 0; j < nbrs.length; j++) {
+            const nb = nbrs[j];
+            const v  = state[nb];
+            if (v === 0) continue;
+
+            let nkLo = keyLo;
+            let nkHi = keyHi;
+            if (e < 16)  nkLo += v * POW4[e];
+            else         nkHi += v * POW4[e - 16];
+            if (nb < 16) nkLo -= v * POW4[nb];
+            else         nkHi -= v * POW4[nb - 16];
+
+            if (map.has(nkLo, nkHi)) continue;
+            const newIdx = prevArr.len;
+            map.set(nkLo, nkHi, newIdx);
+            prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
+            if (other.has(nkLo, nkHi)) { meetLo = nkLo; meetHi = nkHi; break; }
+            nextFrontier.push([nkLo, nkHi]);
+          }
         }
       }
-      startKey = sk; goalKey = gk;
+
+      if (meetLo >= 0) {
+        if (onProgress) onProgress(depthA, depthB, true);
+        const pathA = [];
+        let idx = mapA.get(meetLo, meetHi);
+        while (prevIdxA.get(idx) !== -1) {
+          pathA.push([fromA.get(idx), toA.get(idx)]);
+          idx = prevIdxA.get(idx);
+        }
+        pathA.reverse();
+        const pathB = [];
+        idx = mapB.get(meetLo, meetHi);
+        while (prevIdxB.get(idx) !== -1) {
+          pathB.push([toB.get(idx), fromB.get(idx)]);
+          idx = prevIdxB.get(idx);
+        }
+        return pathA.concat(pathB);
+      }
+      if (expandA) { frontierA = nextFrontier; } else { frontierB = nextFrontier; }
+      if (onProgress) onProgress(depthA, depthB, false);
+      await new Promise(r => setTimeout(r, 0));
+      if (isMemoryHigh()) throw new Error('__OOM__');
     }
+    return null;
+  }
+
+  async function findSolutionStr(myGen, onProgress) {
+    const startKey = encodeBoard(board);
+    const goalKey  = encodeBoard(GOAL);
     if (startKey === goalKey) return [];
 
     const mapA = new Map(), mapB = new Map();
@@ -2642,12 +3607,11 @@
 
     let frontierA = [startKey], frontierB = [goalKey];
     let depthA = 0, depthB = 0;
-    const state = useStrings ? null : new Uint8Array(N);
 
     for (let iter = 0; iter < MAX_ITER; iter++) {
       if (searchGeneration !== myGen) return null;
       if (frontierA.length === 0 && frontierB.length === 0) throw new Error('__UNSOLVABLE__');
-      if (mapA.size + mapB.size > MAX_STATES) throw new Error('__OOM__');
+      if (mapA.size + mapB.size > MAX_STATES_STR) throw new Error('__OOM__');
 
       let expandA;
       if (frontierA.length === 0) expandA = false;
@@ -2670,46 +3634,24 @@
         const key = frontier[fi];
         const keyIdx = map.get(key);
 
-        if (useStrings) {
-          for (let e = 0; e < N && meetKey === null; e++) {
-            if (key.charCodeAt(e) !== 48) continue;
-            const nbrs = neighbors[e];
-            for (let j = 0; j < nbrs.length; j++) {
-              const nb = nbrs[j];
-              if (key.charCodeAt(nb) === 48) continue;
-              let nk;
-              if (e < nb) {
-                nk = key.substring(0, e) + key[nb] + key.substring(e + 1, nb) + '0' + key.substring(nb + 1);
-              } else {
-                nk = key.substring(0, nb) + '0' + key.substring(nb + 1, e) + key[nb] + key.substring(e + 1);
-              }
-              if (map.has(nk)) continue;
-              const newIdx = prevArr.length;
-              map.set(nk, newIdx);
-              prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
-              if (other.has(nk)) { meetKey = nk; break; }
-              nextFrontier.push(nk);
+        for (let e = 0; e < N && meetKey === null; e++) {
+          if (key.charCodeAt(e) !== 48) continue;
+          const nbrs = neighbors[e];
+          for (let j = 0; j < nbrs.length; j++) {
+            const nb = nbrs[j];
+            if (key.charCodeAt(nb) === 48) continue;
+            let nk;
+            if (e < nb) {
+              nk = key.substring(0, e) + key[nb] + key.substring(e + 1, nb) + '0' + key.substring(nb + 1);
+            } else {
+              nk = key.substring(0, nb) + '0' + key.substring(nb + 1, e) + key[nb] + key.substring(e + 1);
             }
-          }
-        } else {
-          let k = key;
-          for (let i = 0; i < N; i++) { state[i] = Number(k & 3n); k >>= 2n; }
-          for (let e = 0; e < N && meetKey === null; e++) {
-            if (state[e] !== 0) continue;
-            const nbrs = neighbors[e];
-            for (let j = 0; j < nbrs.length; j++) {
-              const nb = nbrs[j];
-              const v  = state[nb];
-              if (v === 0) continue;
-              const vb = BigInt(v);
-              const nk = key + vb * POW4_BIG[e] - vb * POW4_BIG[nb];
-              if (map.has(nk)) continue;
-              const newIdx = prevArr.length;
-              map.set(nk, newIdx);
-              prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
-              if (other.has(nk)) { meetKey = nk; break; }
-              nextFrontier.push(nk);
-            }
+            if (map.has(nk)) continue;
+            const newIdx = prevArr.length;
+            map.set(nk, newIdx);
+            prevArr.push(keyIdx); fromArr.push(nb); toArr.push(e);
+            if (other.has(nk)) { meetKey = nk; break; }
+            nextFrontier.push(nk);
           }
         }
       }
@@ -2734,8 +3676,15 @@
       if (expandA) { frontierA = nextFrontier; } else { frontierB = nextFrontier; }
       if (onProgress) onProgress(depthA, depthB, false);
       await new Promise(r => setTimeout(r, 0));
+      if (isMemoryHigh()) throw new Error('__OOM__');
     }
     return null;
+  }
+
+  async function findSolution(myGen, onProgress) {
+    if (N <= NUM_LIMIT) return await findSolutionNum(myGen, onProgress);
+    if (N <= BIG_LIMIT) return await findSolutionNum64(myGen, onProgress);
+    return await findSolutionStr(myGen, onProgress);
   }
 
   function verifyPath(path, startBoard, goalBoard) {
@@ -2870,6 +3819,7 @@
     editor.tool    = 'w';
     editor.name    = isUser ? currentName : (currentName + ' (copy)');
     editor.author  = currentAuthor || DEFAULT_AUTHOR;
+    editor.maxStep = currentMaxStep || 0;
     editorMode = true;
     painting = false;
 
@@ -2884,6 +3834,7 @@
     statusEl.textContent = '';
     statusEl.classList.remove('win');
     authorLine.innerHTML = '';
+    maxStepLine.style.display = 'none';
 
     nameInput.value = editor.name;
     authorInput.value = editor.author;
@@ -2891,6 +3842,7 @@
     colsInput.value = editor.cols;
 
     deleteBtn.style.display = isUser ? '' : 'none';
+    editorCounts.style.display = 'flex';
 
     updateNavButtons();
     updateRotateButton();
@@ -2909,11 +3861,13 @@
     movesRow.style.display     = '';
     editorPanel.style.display  = 'none';
     deleteBtn.style.display    = 'none';
+    editorCounts.style.display = 'none';
     hintEl.innerHTML = t('hintPlay');
     updateNavButtons();
     loadPuzzleData({
       name: currentName, nameEn: currentNameEn, author: currentAuthor,
-      data: START.map(row => row.slice()), rotated: rotated
+      data: START.map(row => row.slice()), rotated: rotated,
+      maxStep: currentMaxStep
     }, editorSourceIdx);
   }
 
@@ -2924,7 +3878,6 @@
     }
   }
 
-  /* Рисование в редакторе: клетки без обработчиков — вся логика через делегирование. */
   function renderEditor() {
     boardEl.innerHTML = '';
     boardEl.classList.toggle('rotated', editor.rotated);
@@ -2943,13 +3896,11 @@
         boardEl.appendChild(cell);
       }
     }
+    updateEditorCounts();
   }
 
   function applyEditorCellVisual(cellEl, v) {
     cellEl.className = 'cell editor-cell';
-    if (!cellEl.dataset.r) {
-      /* уже установлено */
-    }
     cellEl.innerHTML = '';
     if (v === 'x') {
       cellEl.classList.add('off');
@@ -2964,6 +3915,25 @@
       span.textContent = '♞';
       cellEl.appendChild(span);
     }
+  }
+
+  function updateEditorCounts() {
+    if (!editorMode || !editorCounts) return;
+    let w = 0, b = 0, r = 0;
+    for (let i = 0; i < editor.rows; i++) {
+      for (let j = 0; j < editor.cols; j++) {
+        const v = editor.data[i][j];
+        if (v === 'w') w++;
+        else if (v === 'b') b++;
+        else if (v === 'r') r++;
+      }
+    }
+    editorCounts.innerHTML =
+      escapeHTML(t('cntWhite')) + ' <span class="cnt-white">' + w + '</span>' +
+      ' &nbsp;·&nbsp; ' +
+      escapeHTML(t('cntBlack')) + ' <span class="cnt-black">' + b + '</span>' +
+      ' &nbsp;·&nbsp; ' +
+      escapeHTML(t('cntRed'))   + ' <span class="cnt-red">'   + r + '</span>';
   }
 
   function resizeEditorData(newRows, newCols) {
@@ -2997,15 +3967,18 @@
     movesRow.style.display     = '';
     editorPanel.style.display  = 'none';
     deleteBtn.style.display    = 'none';
+    editorCounts.style.display = 'none';
     hintEl.innerHTML = t('hintPlay');
     updateNavButtons();
 
     const isUserSource = isUserLevel(editorSourceIdx);
+    const keepMaxStep = (editor.maxStep && editor.maxStep > 0) ? editor.maxStep : undefined;
 
     if (isUserSource) {
       PUZZLES[editorSourceIdx] = {
         name: newName, nameEn: newName, author: newAuthor,
-        data: editor.data.map(row => row.slice()), rotated: editor.rotated
+        data: editor.data.map(row => row.slice()), rotated: editor.rotated,
+        maxStep: keepMaxStep
       };
       userFlag[editorSourceIdx] = true;
       saveUserPuzzles();
@@ -3020,7 +3993,8 @@
       if (isSameAsSource) {
         PUZZLES[editorSourceIdx] = {
           name: newName, nameEn: newName, author: newAuthor,
-          data: editor.data.map(row => row.slice()), rotated: editor.rotated
+          data: editor.data.map(row => row.slice()), rotated: editor.rotated,
+          maxStep: keepMaxStep
         };
         renderPuzzleSelect();
         puzzleSel.value = String(editorSourceIdx);
@@ -3028,7 +4002,8 @@
       } else {
         PUZZLES.push({
           name: newName, nameEn: newName, author: newAuthor,
-          data: editor.data.map(row => row.slice()), rotated: editor.rotated
+          data: editor.data.map(row => row.slice()), rotated: editor.rotated,
+          maxStep: keepMaxStep
         });
         userFlag.push(true);
         const newIdx = PUZZLES.length - 1;
@@ -3065,6 +4040,7 @@
     movesRow.style.display     = '';
     editorPanel.style.display  = 'none';
     deleteBtn.style.display    = 'none';
+    editorCounts.style.display = 'none';
     hintEl.innerHTML = t('hintPlay');
     updateNavButtons();
 
@@ -3088,13 +4064,17 @@
       for (let c = 0; c < editor.cols; c++) row.push("'" + editor.data[r][c] + "'");
       lines.push('        [' + row.join(', ') + ']');
     }
-    return "    {\n" +
+    let out = "    {\n" +
            "      name: '" + name.replace(/'/g, "\\'") + "',\n" +
-           "      author: '" + author.replace(/'/g, "\\'") + "',\n" +
-           "      data: [\n" + lines.join(',\n') + '\n' +
+           "      author: '" + author.replace(/'/g, "\\'") + "',\n";
+    if (editor.maxStep > 0) {
+      out += "      maxStep: " + editor.maxStep + ",\n";
+    }
+    out += "      data: [\n" + lines.join(',\n') + '\n' +
            "      ],\n" +
            "      rotated: " + (editor.rotated ? 'true' : 'false') + "\n" +
            "    }";
+    return out;
   }
 
   function formatAllPuzzlesJS() {
@@ -3111,8 +4091,11 @@
       if (p.nameEn && p.nameEn !== p.name) {
         entry += "      nameEn: '" + p.nameEn.replace(/'/g, "\\'") + "',\n";
       }
-      entry += "      author: '" + (p.author || DEFAULT_AUTHOR).replace(/'/g, "\\'") + "',\n" +
-               "      data: [\n" + lines.join(',\n') + '\n' +
+      entry += "      author: '" + (p.author || DEFAULT_AUTHOR).replace(/'/g, "\\'") + "',\n";
+      if (typeof p.maxStep === 'number' && p.maxStep > 0) {
+        entry += "      maxStep: " + p.maxStep + ",\n";
+      }
+      entry += "      data: [\n" + lines.join(',\n') + '\n' +
                "      ],\n" +
                "      rotated: " + (p.rotated ? 'true' : 'false') + "\n    }";
       parts.push(entry);
@@ -3126,6 +4109,7 @@
       const nameM    = text.match(/name\s*:\s*['"]([^'"]*)['"]/);
       const authorM  = text.match(/author\s*:\s*['"]([^'"]*)['"]/);
       const rotatedM = text.match(/rotated\s*:\s*(true|false)/);
+      const maxStepM = text.match(/max_?[sS]tep\s*:\s*(\d+)/);
       const dataIdx = text.indexOf('data');
       if (dataIdx < 0) return null;
       const arrStart = text.indexOf('[', dataIdx);
@@ -3169,7 +4153,8 @@
         name:    nameM ? nameM[1] : '',
         author:  authorM ? authorM[1] : '',
         data:    rows,
-        rotated: rotatedM ? rotatedM[1] === 'true' : false
+        rotated: rotatedM ? rotatedM[1] === 'true' : false,
+        maxStep: maxStepM ? parseInt(maxStepM[1], 10) : 0
       };
     } catch (e) { return null; }
   }
@@ -3252,7 +4237,7 @@
   }
 
   /* ============================================================
-     Рисование в редакторе — делегирование и защита от залипания
+     Рисование в редакторе
      ============================================================ */
   function paintEditorCellFromEvent(e) {
     if (!editorMode || !painting) return;
@@ -3268,12 +4253,585 @@
 
     editor.data[rr][cc] = editor.tool;
     applyEditorCellVisual(cellEl, editor.tool);
-    /* dataset сохраняется, но пересоздаём при необходимости */
     cellEl.dataset.r = String(rr);
     cellEl.dataset.c = String(cc);
+    updateEditorCounts();
   }
 
   function endPainting() { painting = false; }
+
+  /* ============================================================
+     АНАЛИЗАТОР — утилиты
+     ============================================================ */
+  function buildAnalyzerContext(START_, ROWS_, COLS_) {
+    const cells_ = [];
+    const cellIndex_ = new Map();
+    for (let r = 0; r < ROWS_; r++) {
+      for (let c = 0; c < COLS_; c++) {
+        if (START_[r][c] !== 'x') {
+          cellIndex_.set(r + ',' + c, cells_.length);
+          cells_.push([r, c]);
+        }
+      }
+    }
+    const N_ = cells_.length;
+    const neighbors_ = new Array(N_);
+    for (let i = 0; i < N_; i++) {
+      const r = cells_[i][0], c = cells_[i][1];
+      const list = [];
+      for (let k = 0; k < KNIGHT_STEPS.length; k++) {
+        const key = (r + KNIGHT_STEPS[k][0]) + ',' + (c + KNIGHT_STEPS[k][1]);
+        if (cellIndex_.has(key)) list.push(cellIndex_.get(key));
+      }
+      neighbors_[i] = list;
+    }
+    return { START: START_, ROWS: ROWS_, COLS: COLS_, cells: cells_, cellIndex: cellIndex_, neighbors: neighbors_, N: N_ };
+  }
+
+  function encodeBoardCtx(bd, ctx) {
+    let s = '';
+    for (let i = 0; i < ctx.N; i++) {
+      const r = ctx.cells[i][0], c = ctx.cells[i][1];
+      const v = bd[r][c];
+      const code = v === 'w' ? 1 : v === 'b' ? 2 : v === 'r' ? 3 : 0;
+      s += String.fromCharCode(48 + code);
+    }
+    return s;
+  }
+
+  function decodeBoardCtx(key, ctx) {
+    const bd = ctx.START.map(row => row.slice());
+    for (let i = 0; i < ctx.N; i++) {
+      const r = ctx.cells[i][0], c = ctx.cells[i][1];
+      const v = key.charCodeAt(i) - 48;
+      bd[r][c] = v === 0 ? '_' : (v === 1 ? 'w' : (v === 2 ? 'b' : 'r'));
+    }
+    return bd;
+  }
+
+  function hasSymmetry(bd) {
+    const R = bd.length;
+    if (R === 0) return false;
+    const C = bd[0].length;
+    if (C === 0) return false;
+
+    let ok = true;
+    for (let r = 0; r < R && ok; r++) {
+      for (let c = 0; c < C; c++) {
+        if (bd[r][c] !== bd[r][C - 1 - c]) { ok = false; break; }
+      }
+    }
+    if (ok) return true;
+
+    ok = true;
+    for (let r = 0; r < R && ok; r++) {
+      for (let c = 0; c < C; c++) {
+        if (bd[r][c] !== bd[R - 1 - r][c]) { ok = false; break; }
+      }
+    }
+    if (ok) return true;
+
+    if (R === C) {
+      ok = true;
+      for (let r = 0; r < R && ok; r++) {
+        for (let c = 0; c < C; c++) {
+          if (bd[r][c] !== bd[c][r]) { ok = false; break; }
+        }
+      }
+      if (ok) return true;
+
+      ok = true;
+      for (let r = 0; r < R && ok; r++) {
+        for (let c = 0; c < C; c++) {
+          if (bd[r][c] !== bd[C - 1 - c][R - 1 - r]) { ok = false; break; }
+        }
+      }
+      if (ok) return true;
+    }
+
+    return false;
+  }
+
+  function applyAnalyzerSymmetryFilter() {
+    if (!analyzerSymmetryOnly) {
+      analyzerResults = analyzerResultsFull.slice();
+      analyzerSymmetryEmpty = false;
+    } else {
+      const filtered = analyzerResultsFull.filter(function (r) {
+        const bdL = decodeBoardCtx(r.Lkey, analyzerCtx);
+        return hasSymmetry(bdL);
+      });
+      if (filtered.length === 0) {
+        analyzerResults = analyzerResultsFull.slice();
+        analyzerSymmetryEmpty = true;
+      } else {
+        analyzerResults = filtered;
+        analyzerSymmetryEmpty = false;
+      }
+    }
+    analyzerResultIdx = 0;
+  }
+
+  function renderBoardToEl(bd, container, cellSize) {
+    const ctx = analyzerCtx;
+    container.className = 'ana-board';
+    container.style.gridTemplateColumns = 'repeat(' + ctx.COLS + ', ' + cellSize + 'px)';
+    container.style.gap = '2px';
+    container.innerHTML = '';
+    for (let r = 0; r < ctx.ROWS; r++) {
+      for (let c = 0; c < ctx.COLS; c++) {
+        const cell = document.createElement('div');
+        const v = bd[r][c];
+        cell.style.width = cellSize + 'px';
+        cell.style.height = cellSize + 'px';
+        cell.style.borderRadius = '4px';
+        cell.style.display = 'flex';
+        cell.style.alignItems = 'center';
+        cell.style.justifyContent = 'center';
+        cell.style.fontSize = Math.floor(cellSize * 0.95) + 'px';
+        cell.style.lineHeight = '1';
+        if (v === 'x') {
+          /* вне поля */
+        } else if (v === '_') {
+          cell.classList.add('ana-cell', 'ana-empty');
+          cell.style.background = '#4f5b78';
+          cell.style.boxShadow = 'inset 0 0 0 2px #5f6d8a';
+        } else {
+          cell.classList.add('ana-cell', 'ana-knight');
+          cell.style.background = '#556590';
+          cell.style.boxShadow = 'inset 0 0 0 2px #6b7ba5';
+          cell.textContent = '♞';
+          if (v === 'w') {
+            cell.classList.add('ana-w');
+            cell.style.color = '#ffffff';
+            cell.style.webkitTextStroke = '1.2px #12182a';
+          } else if (v === 'b') {
+            cell.classList.add('ana-b');
+            cell.style.color = '#10141f';
+            cell.style.webkitTextStroke = '1.2px #8ea0c8';
+          } else {
+            cell.classList.add('ana-r');
+            cell.style.color = '#e85a5a';
+            cell.style.webkitTextStroke = '1.2px #4a1010';
+          }
+        }
+        container.appendChild(cell);
+      }
+    }
+  }
+
+  function renderAnaSource() {
+    if (!analyzerCtx || !analyzerSourceBoard) return;
+    const maxDim = Math.max(analyzerCtx.ROWS, analyzerCtx.COLS);
+    const cellSize = Math.max(20, Math.min(42, Math.floor(320 / maxDim)));
+    renderBoardToEl(analyzerSourceBoard, anaSourceBoardEl, cellSize);
+  }
+
+  function renderAnaResult() {
+    anaResultBoards.innerHTML = '';
+
+    if (analyzerDisplayMode === 'furthest') {
+      const item = analyzerFurthest[analyzerFurthestIdx];
+      if (!item) return;
+      const wrap = document.createElement('div');
+      wrap.className = 'ana-board-wrap';
+      const info = document.createElement('div');
+      info.className = 'ana-board-info';
+      info.textContent = 'Шаг: ' + item.depth + ' / ' + analyzerMaxDepth;
+      const boardDiv = document.createElement('div');
+      const maxDim = Math.max(analyzerCtx.ROWS, analyzerCtx.COLS);
+      const cellSize = Math.max(20, Math.min(42, Math.floor(320 / maxDim)));
+      renderBoardToEl(decodeBoardCtx(item.key, analyzerCtx), boardDiv, cellSize);
+      wrap.appendChild(info);
+      wrap.appendChild(boardDiv);
+      anaResultBoards.appendChild(wrap);
+    } else if (analyzerDisplayMode === 'analysis') {
+      const item = analyzerResults[analyzerResultIdx];
+      if (!item) return;
+      const maxDim = Math.max(analyzerCtx.ROWS, analyzerCtx.COLS);
+      const cellSize = Math.max(18, Math.min(36, Math.floor(260 / maxDim)));
+
+      const wrapL = document.createElement('div');
+      wrapL.className = 'ana-board-wrap';
+      const infoL = document.createElement('div');
+      infoL.className = 'ana-board-info';
+      infoL.textContent = 'Старт (шаг ' + item.Ldepth + ')';
+      const boardL = document.createElement('div');
+      renderBoardToEl(decodeBoardCtx(item.Lkey, analyzerCtx), boardL, cellSize);
+      wrapL.appendChild(infoL);
+      wrapL.appendChild(boardL);
+
+      const wrapR = document.createElement('div');
+      wrapR.className = 'ana-board-wrap';
+      const infoR = document.createElement('div');
+      infoR.className = 'ana-board-info';
+      infoR.textContent = 'Цель (шаг ' + item.Rdepth + ')';
+      const boardR = document.createElement('div');
+      renderBoardToEl(decodeBoardCtx(item.Rkey, analyzerCtx), boardR, cellSize);
+      wrapR.appendChild(infoR);
+      wrapR.appendChild(boardR);
+
+      anaResultBoards.appendChild(wrapL);
+      anaResultBoards.appendChild(wrapR);
+    }
+
+    const total = (analyzerDisplayMode === 'furthest')
+      ? analyzerFurthest.length : analyzerResults.length;
+    const idx = (analyzerDisplayMode === 'furthest')
+      ? analyzerFurthestIdx : analyzerResultIdx;
+    anaIdxLabel.textContent = (total > 0 ? (idx + 1) : 0) + ' / ' + total;
+
+    anaResultLabel.textContent = (analyzerDisplayMode === 'furthest')
+      ? 'Самое дальнее состояние (глубина ' + analyzerMaxDepth + '):'
+      : 'Найденные заготовки головоломок:';
+  }
+
+  function setAnaStatus(text) {
+    anaStatusEl.textContent = text;
+  }
+
+  function updateAnaButtons() {
+    if (analyzerSearchRunning) {
+      anaSearchBtn.style.display = 'none';
+      anaAnalysisBtn.style.display = 'none';
+      anaStopBtn.style.display = '';
+    } else {
+      anaSearchBtn.style.display = '';
+      anaAnalysisBtn.style.display = '';
+      anaStopBtn.style.display = 'none';
+      anaAnalysisBtn.disabled = !analyzerLevels || analyzerLevels.length < 2;
+    }
+    const total = (analyzerDisplayMode === 'furthest')
+      ? analyzerFurthest.length : analyzerResults.length;
+    const idx = (analyzerDisplayMode === 'furthest')
+      ? analyzerFurthestIdx : analyzerResultIdx;
+    anaFirstBtn.disabled = (total === 0) || (idx === 0);
+    anaPrevBtn.disabled  = (total === 0) || (idx === 0);
+    anaNextBtn.disabled  = (total === 0) || (idx >= total - 1);
+    anaLastBtn.disabled  = (total === 0) || (idx >= total - 1);
+
+    if (analyzerDisplayMode === 'furthest') {
+      anaSwapBtn.style.display = '';
+      anaSwapBtn.disabled = (total === 0);
+    } else {
+      anaSwapBtn.style.display = 'none';
+    }
+
+    if (analyzerDisplayMode === 'analysis') {
+      anaSymmetryBtn.style.display = '';
+      anaSymmetryBtn.disabled = (analyzerResultsFull.length === 0);
+      if (analyzerSymmetryOnly && analyzerSymmetryEmpty) {
+        anaSymmetryBtn.textContent = t('anaShowSymEmpty');
+        anaSymmetryBtn.classList.add('sym-empty');
+      } else if (analyzerSymmetryOnly) {
+        anaSymmetryBtn.textContent = t('anaShowAll');
+        anaSymmetryBtn.classList.remove('sym-empty');
+      } else {
+        anaSymmetryBtn.textContent = t('anaShowSym');
+        anaSymmetryBtn.classList.remove('sym-empty');
+      }
+    } else {
+      anaSymmetryBtn.style.display = 'none';
+      anaSymmetryBtn.classList.remove('sym-empty');
+    }
+  }
+
+  /* ============================================================
+     АНАЛИЗАТОР — вход/выход
+     ============================================================ */
+  function enterAnalyzer() {
+    if (editorMode !== true) return;
+    if (animating || mode !== 'idle') return;
+
+    analyzerMode = true;
+    analyzerSourceBoard = editor.data.map(r => r.slice());
+    analyzerCtx = buildAnalyzerContext(analyzerSourceBoard, editor.rows, editor.cols);
+
+    analyzerLevels = null;
+    analyzerFurthest = [];
+    analyzerResults = [];
+    analyzerResultsFull = [];
+    analyzerSymmetryOnly = false;
+    analyzerSymmetryEmpty = false;
+    analyzerFurthestIdx = 0;
+    analyzerResultIdx = 0;
+    analyzerDisplayMode = 'furthest';
+    analyzerMaxDepth = 0;
+    analyzerVisitedCount = 0;
+    analyzerCapped = false;
+    analyzerSearchRunning = false;
+
+    sizePanel.style.display    = 'none';
+    editorPanel.style.display  = 'none';
+    boardWrap.style.display    = 'none';
+    statusEl.style.display     = 'none';
+    hintEl.style.display       = 'none';
+    authorLine.style.display   = 'none';
+    maxStepLine.style.display  = 'none';
+    editorCounts.style.display = 'none';
+
+    analyzerArea.style.display = '';
+    anaResultSection.style.display = 'none';
+
+    setAnaStatus('');
+    renderAnaSource();
+    updateAnaButtons();
+  }
+
+  function exitAnalyzer(saveChanges) {
+    analyzerMode = false;
+    analyzerSearchGen++;
+    analyzerAnalysisGen++;
+    analyzerSearchRunning = false;
+
+    analyzerArea.style.display = 'none';
+
+    boardWrap.style.display    = '';
+    statusEl.style.display     = '';
+    hintEl.style.display       = '';
+    authorLine.style.display   = '';
+    sizePanel.style.display    = 'flex';
+    editorPanel.style.display  = 'flex';
+    editorCounts.style.display = 'flex';
+    hintEl.innerHTML = t('hintEdit');
+    statusEl.textContent = '';
+    authorLine.innerHTML = '';
+    maxStepLine.style.display = 'none';
+
+    if (saveChanges && analyzerSourceBoard) {
+      editor.rows = analyzerSourceBoard.length;
+      editor.cols = analyzerSourceBoard[0].length;
+      editor.data = analyzerSourceBoard.map(r => r.slice());
+      rowsInput.value = editor.rows;
+      colsInput.value = editor.cols;
+    }
+
+    updateCellSize();
+    renderEditor();
+    updateBoardWrapPadding();
+  }
+
+  /* ============================================================
+     АНАЛИЗАТОР — поиск (однонаправленный BFS)
+     ============================================================ */
+  async function analyzerSearch() {
+    if (analyzerSearchRunning) return;
+    if (!analyzerCtx) return;
+
+    const ctx = analyzerCtx;
+    const myGen = ++analyzerSearchGen;
+    analyzerSearchRunning = true;
+    analyzerSearchStartTime = performance.now();
+    analyzerCapped = false;
+
+    analyzerLevels = [[encodeBoardCtx(analyzerSourceBoard, ctx)]];
+    analyzerFurthest = [];
+    analyzerFurthestIdx = 0;
+    analyzerResults = [];
+    analyzerResultsFull = [];
+    analyzerSymmetryOnly = false;
+    analyzerSymmetryEmpty = false;
+    analyzerResultIdx = 0;
+    analyzerDisplayMode = 'furthest';
+    analyzerMaxDepth = 0;
+
+    const visited = new Set();
+    visited.add(analyzerLevels[0][0]);
+    let frontier = analyzerLevels[0].slice();
+    let depth = 0;
+    const state = new Uint8Array(ctx.N);
+
+    updateAnaButtons();
+    setAnaStatus('Поиск…');
+
+    while (frontier.length > 0 && depth < ANALYZER_MAX_DEPTH) {
+      if (analyzerSearchGen !== myGen) { analyzerSearchRunning = false; updateAnaButtons(); return; }
+      if (visited.size > ANALYZER_MAX_STATES) {
+        analyzerCapped = true;
+        break;
+      }
+
+      depth++;
+      const nextFrontier = [];
+      let lastYield = performance.now();
+
+      for (let fi = 0; fi < frontier.length; fi++) {
+        const key = frontier[fi];
+
+        for (let i = 0; i < ctx.N; i++) state[i] = key.charCodeAt(i) - 48;
+
+        for (let e = 0; e < ctx.N; e++) {
+          if (state[e] !== 0) continue;
+          const nbrs = ctx.neighbors[e];
+          for (let j = 0; j < nbrs.length; j++) {
+            const nb = nbrs[j];
+            const v = state[nb];
+            if (v === 0) continue;
+            let nk;
+            if (e < nb) {
+              nk = key.substring(0, e) + key[nb] + key.substring(e + 1, nb) + '0' + key.substring(nb + 1);
+            } else {
+              nk = key.substring(0, nb) + '0' + key.substring(nb + 1, e) + key[nb] + key.substring(e + 1);
+            }
+            if (visited.has(nk)) continue;
+            visited.add(nk);
+            nextFrontier.push(nk);
+          }
+        }
+
+        const now = performance.now();
+        if (now - lastYield > 30) {
+          lastYield = now;
+          if (analyzerSearchGen !== myGen) { analyzerSearchRunning = false; updateAnaButtons(); return; }
+          const elapsed = ((now - analyzerSearchStartTime) / 1000).toFixed(1);
+          setAnaStatus('Поиск… глубина: ' + depth + ', состояний: ' + visited.size + ', время: ' + elapsed + ' сек…');
+          await new Promise(r => setTimeout(r, 0));
+        }
+      }
+
+      if (nextFrontier.length === 0) break;
+      analyzerLevels.push(nextFrontier);
+      frontier = nextFrontier;
+    }
+
+    analyzerMaxDepth = analyzerLevels.length - 1;
+    analyzerVisitedCount = visited.size;
+
+    const furthestKeys = analyzerLevels[analyzerLevels.length - 1];
+    analyzerFurthest = furthestKeys.map(k => ({ depth: analyzerMaxDepth, key: k }));
+    analyzerFurthestIdx = 0;
+    analyzerSearchRunning = false;
+
+    const elapsed = ((performance.now() - analyzerSearchStartTime) / 1000).toFixed(1);
+
+    if (furthestKeys.length === 0) {
+      setAnaStatus('Глубина 0 (нет ходов). Время: ' + elapsed + ' сек.');
+      updateAnaButtons();
+      return;
+    }
+
+    let statusText = 'Готово. Глубина: ' + analyzerMaxDepth
+      + ', состояний: ' + analyzerVisitedCount
+      + ', дальних: ' + furthestKeys.length
+      + ', время: ' + elapsed + ' сек.';
+    if (analyzerCapped) statusText += ' (ограничение состояний, поиск не полный)';
+    setAnaStatus(statusText);
+
+    anaResultSection.style.display = '';
+    renderAnaResult();
+    updateAnaButtons();
+  }
+
+  /* ============================================================
+     АНАЛИЗАТОР — анализ заготовок
+     ============================================================ */
+  async function analyzerAnalyze() {
+    if (!analyzerLevels || analyzerLevels.length < 2) return;
+    if (analyzerSearchRunning) return;
+
+    const ctx = analyzerCtx;
+    const myGen = ++analyzerAnalysisGen;
+    const startTime = performance.now();
+
+    const totalLevels = analyzerLevels.length;
+    if (totalLevels < 2) { setAnaStatus('Слишком мало уровней для анализа.'); return; }
+
+    // 25% уровней слева и 25% справа (минимум по одному уровню).
+    const edgeCount = Math.max(1, Math.floor(totalLevels * ANALYZER_EDGE_FRACTION));
+
+    const leftSample = [];
+    const rightSample = [];
+
+    for (let d = 0; d < edgeCount; d++) {
+      const states = analyzerLevels[d] || [];
+      const lim = Math.min(states.length, ANALYZER_LEVEL_SAMPLE);
+      for (let i = 0; i < lim; i++) {
+        leftSample.push({ depth: d, key: states[i] });
+      }
+    }
+    for (let d = Math.max(0, totalLevels - edgeCount); d < totalLevels; d++) {
+      const states = analyzerLevels[d] || [];
+      const lim = Math.min(states.length, ANALYZER_LEVEL_SAMPLE);
+      for (let i = 0; i < lim; i++) {
+        rightSample.push({ depth: d, key: states[i] });
+      }
+    }
+
+    setAnaStatus('Анализ… перебрано: 0, найдено: 0.');
+    anaAnalysisBtn.disabled = true;
+
+    const results = [];
+    let compared = 0;
+    let lastYield = performance.now();
+    const nLocal = ctx.N;
+    const expectedR = new Uint8Array(nLocal);
+
+    for (let i = 0; i < leftSample.length; i++) {
+      const Lkey = leftSample[i].key;
+
+      let hasW = false, hasB = false;
+      for (let k = 0; k < nLocal; k++) {
+        const v = Lkey.charCodeAt(k) - 48;
+        if (v === 1) hasW = true;
+        else if (v === 2) hasB = true;
+      }
+      if (!hasW || !hasB) continue;
+
+      for (let k = 0; k < nLocal; k++) {
+        const v = Lkey.charCodeAt(k) - 48;
+        expectedR[k] = v === 1 ? 2 : (v === 2 ? 1 : v);
+      }
+
+      for (let j = 0; j < rightSample.length; j++) {
+        compared++;
+        const Rkey = rightSample[j].key;
+        let match = true;
+        for (let k = 0; k < nLocal; k++) {
+          if (Rkey.charCodeAt(k) - 48 !== expectedR[k]) { match = false; break; }
+        }
+        if (match) {
+          results.push({
+            Ldepth: leftSample[i].depth,
+            Rdepth: rightSample[j].depth,
+            Lkey: Lkey,
+            Rkey: Rkey
+          });
+        }
+
+        const now = performance.now();
+        if (now - lastYield > 60) {
+          lastYield = now;
+          if (analyzerAnalysisGen !== myGen) { anaAnalysisBtn.disabled = false; return; }
+          const elapsed = ((now - startTime) / 1000).toFixed(1);
+          setAnaStatus('Анализ… перебрано: ' + compared + ', найдено: ' + results.length + ', время: ' + elapsed + ' сек…');
+          await new Promise(r => setTimeout(r, 0));
+        }
+      }
+    }
+
+    results.sort(function (a, b) {
+      return (b.Rdepth - b.Ldepth) - (a.Rdepth - a.Ldepth);
+    });
+
+    analyzerResultsFull = results.slice();
+    analyzerSymmetryOnly = false;
+    analyzerSymmetryEmpty = false;
+    applyAnalyzerSymmetryFilter();
+    analyzerDisplayMode = 'analysis';
+    anaAnalysisBtn.disabled = false;
+
+    const elapsed = ((performance.now() - startTime) / 1000).toFixed(1);
+
+    if (results.length === 0) {
+      setAnaStatus('Анализ завершён. Перебрано: ' + compared + ', заготовок не найдено. Время: ' + elapsed + ' сек.');
+      return;
+    }
+
+    setAnaStatus('Анализ завершён. Перебрано: ' + compared + ', найдено: ' + results.length + ', время: ' + elapsed + ' сек.');
+    anaResultSection.style.display = '';
+    renderAnaResult();
+    updateAnaButtons();
+  }
 
   /* ============================================================
      Обработчики
@@ -3297,27 +4855,13 @@
     if (!cellEl) return;
     if (cellEl.parentNode !== boardEl) return;
 
-    let idx = 0;
-    const children = boardEl.children;
-    for (let i = 0; i < children.length; i++) {
-      if (children[i] === cellEl) { idx = i; break; }
-    }
-    const showCoords = !editorMode;
-    const colsTotal = showCoords ? (COLS + 1) : COLS;
-    const rowIndex = Math.floor(idx / colsTotal);
-    const colIndex = idx - rowIndex * colsTotal;
-    let found;
-    if (showCoords) {
-      if (colIndex === 0) return;
-      found = [rowIndex, colIndex - 1];
-    } else {
-      found = [rowIndex, colIndex];
-    }
-    if (!found) return;
-    if (found[0] !== hintTo[0] || found[1] !== hintTo[1]) return;
+    const rr = parseInt(cellEl.dataset.r, 10);
+    const cc = parseInt(cellEl.dataset.c, 10);
+    if (isNaN(rr) || isNaN(cc)) return;
+    if (rr !== hintTo[0] || cc !== hintTo[1]) return;
 
     const fr = hintFrom[0], fc = hintFrom[1];
-    const tr = hintTo[0], tc = hintTo[1];
+    const tr = hintTo[0],   tc = hintTo[1];
     const color = board[fr][fc];
     if (!isKnight(color)) return;
     if (board[tr][tc] !== '_') return;
@@ -3348,6 +4892,7 @@
     const startBoardCopy = board.map(row => row.slice());
     const goalBoardCopy  = GOAL.map(row => row.slice());
     let path = null, oom = false, unsolvable = false;
+    let limitHit = MAX_STATES;
 
     try {
       path = await findSolution(myGen, function (dA, dB, found) {
@@ -3356,9 +4901,14 @@
         lastDepthTotal = dA + dB;
       });
     } catch (e) {
-      if (e && e.message === '__OOM__') oom = true;
-      else if (e && e.message === '__UNSOLVABLE__') unsolvable = true;
-      else throw e;
+      if (e && e.message === '__OOM__') {
+        oom = true;
+        limitHit = (N <= BIG_LIMIT) ? MAX_STATES : MAX_STATES_STR;
+      } else if (e && e.message === '__UNSOLVABLE__') {
+        unsolvable = true;
+      } else {
+        throw e;
+      }
     }
 
     stopSearchProgress();
@@ -3366,7 +4916,7 @@
     if (searchGeneration !== myGen) return;
     if (oom) {
       mode = 'idle';
-      setStatus('tooHard', MAX_STATES.toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US'));
+      setStatus('tooHard', limitHit.toLocaleString(lang === 'ru' ? 'ru-RU' : 'en-US'));
       updateButtons();
       return;
     }
@@ -3404,6 +4954,126 @@
   cancelBtn.addEventListener('click', exitEditor);
   runBtn.addEventListener('click', runEditedPuzzle);
   deleteBtn.addEventListener('click', deleteEditedPuzzle);
+  editorAnalyzerBtn.addEventListener('click', enterAnalyzer);
+
+  anaSearchBtn.addEventListener('click', function () { analyzerSearch(); });
+  anaAnalysisBtn.addEventListener('click', function () { analyzerAnalyze(); });
+  anaStopBtn.addEventListener('click', function () {
+    analyzerSearchGen++;
+    analyzerAnalysisGen++;
+    analyzerSearchRunning = false;
+    setAnaStatus('Остановлено.');
+    updateAnaButtons();
+  });
+  anaFirstBtn.addEventListener('click', function () {
+    if (analyzerDisplayMode === 'furthest') {
+      if (analyzerFurthestIdx !== 0) {
+        analyzerFurthestIdx = 0;
+        renderAnaResult(); updateAnaButtons();
+      }
+    } else {
+      if (analyzerResultIdx !== 0) {
+        analyzerResultIdx = 0;
+        renderAnaResult(); updateAnaButtons();
+      }
+    }
+  });
+  anaPrevBtn.addEventListener('click', function () {
+    if (analyzerDisplayMode === 'furthest') {
+      if (analyzerFurthestIdx > 0) { analyzerFurthestIdx--; renderAnaResult(); updateAnaButtons(); }
+    } else {
+      if (analyzerResultIdx > 0) { analyzerResultIdx--; renderAnaResult(); updateAnaButtons(); }
+    }
+  });
+  anaNextBtn.addEventListener('click', function () {
+    if (analyzerDisplayMode === 'furthest') {
+      if (analyzerFurthestIdx < analyzerFurthest.length - 1) { analyzerFurthestIdx++; renderAnaResult(); updateAnaButtons(); }
+    } else {
+      if (analyzerResultIdx < analyzerResults.length - 1) { analyzerResultIdx++; renderAnaResult(); updateAnaButtons(); }
+    }
+  });
+  anaLastBtn.addEventListener('click', function () {
+    if (analyzerDisplayMode === 'furthest') {
+      const last = analyzerFurthest.length - 1;
+      if (last >= 0 && analyzerFurthestIdx !== last) {
+        analyzerFurthestIdx = last;
+        renderAnaResult(); updateAnaButtons();
+      }
+    } else {
+      const last = analyzerResults.length - 1;
+      if (last >= 0 && analyzerResultIdx !== last) {
+        analyzerResultIdx = last;
+        renderAnaResult(); updateAnaButtons();
+      }
+    }
+  });
+  anaSwapBtn.addEventListener('click', function () {
+    if (analyzerDisplayMode !== 'furthest') return;
+    const item = analyzerFurthest[analyzerFurthestIdx];
+    if (!item) return;
+
+    analyzerSourceBoard = decodeBoardCtx(item.key, analyzerCtx);
+    analyzerCtx = buildAnalyzerContext(
+      analyzerSourceBoard,
+      analyzerSourceBoard.length,
+      analyzerSourceBoard[0].length
+    );
+
+    analyzerLevels = null;
+    analyzerFurthest = [];
+    analyzerResults = [];
+    analyzerResultsFull = [];
+    analyzerSymmetryOnly = false;
+    analyzerSymmetryEmpty = false;
+    analyzerFurthestIdx = 0;
+    analyzerResultIdx = 0;
+    analyzerDisplayMode = 'furthest';
+    analyzerMaxDepth = 0;
+    anaResultSection.style.display = 'none';
+
+    setAnaStatus('Доска заменена на выбранную. Нажмите «Поиск» для нового исследования.');
+    renderAnaSource();
+    updateAnaButtons();
+  });
+
+  anaSymmetryBtn.addEventListener('click', function () {
+    if (analyzerDisplayMode !== 'analysis') return;
+    analyzerSymmetryOnly = !analyzerSymmetryOnly;
+    applyAnalyzerSymmetryFilter();
+    renderAnaResult();
+    updateAnaButtons();
+    let msg;
+    if (analyzerSymmetryOnly && analyzerSymmetryEmpty) {
+      msg = 'Симметричных не найдено. Показано: ' + analyzerResults.length + ' (все).';
+    } else if (analyzerSymmetryOnly) {
+      msg = 'Только симметричные: ' + analyzerResults.length + ' из ' + analyzerResultsFull.length + '.';
+    } else {
+      msg = 'Показано: ' + analyzerResults.length + ' (все).';
+    }
+    setAnaStatus(msg);
+  });
+
+  anaRunBtn.addEventListener('click', function () {
+    let bd = null;
+
+    if (analyzerDisplayMode === 'analysis' && analyzerResults.length > 0) {
+      const item = analyzerResults[analyzerResultIdx];
+      if (item) bd = decodeBoardCtx(item.Lkey, analyzerCtx);
+    } else if (analyzerDisplayMode === 'furthest' && analyzerFurthest.length > 0) {
+      const item = analyzerFurthest[analyzerFurthestIdx];
+      if (item) bd = decodeBoardCtx(item.key, analyzerCtx);
+    }
+
+    if (!bd) bd = analyzerSourceBoard;
+    if (!bd) return;
+
+    analyzerSourceBoard = bd.map(r => r.slice());
+    exitAnalyzer(true);
+    runEditedPuzzle();
+  });
+  anaCancelBtn.addEventListener('click', function () {
+    exitAnalyzer(false);
+  });
 
   rotBtn.addEventListener('click', function () {
     editor.rotated = !editor.rotated;
@@ -3442,6 +5112,7 @@
       editor.cols    = parsed.data[0].length;
       editor.data    = parsed.data.map(function (row) { return row.slice(); });
       editor.rotated = !!parsed.rotated;
+      editor.maxStep = parsed.maxStep || 0;
 
       nameInput.value = editor.name;
       authorInput.value = editor.author;
@@ -3534,7 +5205,6 @@
   rowsInput.addEventListener('blur',   commitSize);
   colsInput.addEventListener('blur',   commitSize);
 
-  /* --- Рисование в редакторе: весь ввод через document и boardEl --- */
   boardEl.addEventListener('mousedown', function (e) {
     if (!editorMode) return;
     if (e.button !== 0) return;
@@ -3551,20 +5221,17 @@
       applyEditorCellVisual(cellEl, editor.tool);
       cellEl.dataset.r = String(rr);
       cellEl.dataset.c = String(cc);
+      updateEditorCounts();
     }
-    /* Отключаем native drag-and-drop выделения */
     if (e.preventDefault) e.preventDefault();
   });
 
   document.addEventListener('mousemove', function (e) {
     if (!editorMode) return;
-
-    /* Если зажатия нет — рисование прекращаем */
     if (painting && (e.buttons & 1) === 0) {
       painting = false;
       return;
     }
-
     if (!painting) return;
     paintEditorCellFromEvent(e);
   });
@@ -3576,21 +5243,6 @@
   window.addEventListener('blur', endPainting);
   document.addEventListener('touchend', endPainting);
   document.addEventListener('touchcancel', endPainting);
-
-  /* Резервный сброс: если за 300 мс после mousedown не пришло
-     ни одного mousemove с зажатой кнопкой — гасим painting. */
-  let paintingWatchdog = null;
-  boardEl.addEventListener('mousedown', function () {
-    if (!editorMode) return;
-    if (paintingWatchdog) clearTimeout(paintingWatchdog);
-    paintingWatchdog = setTimeout(function () {
-      if (!editorMode) return;
-      if (painting) {
-        /* Проверим — возможно, мышь уже отпущена */
-        painting = false;
-      }
-    }, 3000);
-  });
 
   boardWrap.addEventListener('wheel', function (e) {
     if (editorMode) return;
